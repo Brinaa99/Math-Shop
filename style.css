@@ -1,0 +1,1395 @@
+/* ==========================================================================
+   NUMBERLAND — MATH SHOP (SUPERMARKET GAME)
+   Standard 3 Mathematics: Malaysian Ringgit (RM), Money & Cashier
+   Theme: Light Retro Game Console + Children's Supermarket Game
+   Visual Style: Medium/light navy background, cream panels, dark navy borders,
+                 chunky retro typography, tactile buttons, no glowing effects.
+   ========================================================================== */
+
+:root {
+  --primary-font: 'Fredoka', 'Outfit', system-ui, -apple-system, sans-serif;
+  --display-font: 'Fredoka', 'Outfit', system-ui, sans-serif;
+  --mono-font: 'Share Tech Mono', 'Press Start 2P', monospace;
+
+  /* Retro Console & Supermarket Palette */
+  --bg-navy: #2d3f57;              /* Medium/Light Navy Game Background */
+  --bg-navy-surface: #3a506d;      /* Lighter Blue-Gray Texture */
+  --border-navy: #152234;          /* Dark Navy Console Outlines */
+  --panel-cream: #fdfbf7;          /* Primary Cream Off-White Panel */
+  --panel-cream-dark: #f5efe4;     /* Secondary Inset Cream */
+  --panel-cream-tint: #ede6d8;     /* Inset Shadow Cream */
+
+  /* Supermarket Shelf Colors */
+  --shelf-bg: #f9f6f0;
+  --shelf-wood: #d4a373;
+  --shelf-beam: #b07d4b;
+  --shelf-border: #152234;
+
+  /* High Contrast Typography */
+  --text-main: #132238;            /* Deep Navy for readability */
+  --text-dim: #5a6e85;             /* Secondary Slate Navy */
+  --text-white: #ffffff;
+
+  /* Bright Controlled Accents (No Neon, No Glow) */
+  --accent-gold: #f59e0b;          /* Coins, Highlights */
+  --accent-green: #16a34a;         /* Checkout, Correct, Success */
+  --accent-green-dark: #15803d;
+  --accent-blue: #2563eb;          /* Controls, Numbers */
+  --accent-blue-dark: #1d4ed8;
+  --accent-red: #dc2626;           /* Mistakes, Undo/Clear, Lost Lives */
+  --accent-orange: #ea580c;        /* Shopping Accents */
+  --accent-purple: #7c3aed;
+
+  /* Malaysian Ringgit (RM) Banknotes Palette */
+  --rm50-bg: #0284c7;              /* RM50 Cyan/Blue */
+  --rm20-bg: #ea580c;              /* RM20 Orange */
+  --rm10-bg: #dc2626;              /* RM10 Red */
+  --rm5-bg: #16a34a;               /* RM5 Green */
+  --rm1-bg: #2563eb;               /* RM1 Blue */
+
+  /* Flat 3D Offset Drop Shadows (No Soft Blurred Glow) */
+  --shadow-flat: 0 4px 0 var(--border-navy);
+  --shadow-flat-sm: 0 2px 0 var(--border-navy);
+  --shadow-flat-btn: 0 3px 0 var(--border-navy);
+  --shadow-flat-lg: 0 8px 0 var(--border-navy);
+}
+
+/* Global Reset & Base */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body, html {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-navy);
+  background-image: 
+    radial-gradient(var(--bg-navy-surface) 1px, transparent 1px),
+    radial-gradient(var(--bg-navy-surface) 1px, var(--bg-navy) 1px);
+  background-size: 24px 24px;
+  background-position: 0 0, 12px 12px;
+  font-family: var(--primary-font);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-main);
+}
+
+#game-app {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 8px;
+}
+
+/* Main Supermarket Cabinet Frame (Solid Retro Console Chassis) */
+#game-container {
+  width: min(97vw, 1380px);
+  height: min(96vh, 900px);
+  min-height: 600px;
+  position: relative;
+  background: #ede7dc;
+  border: 3px solid var(--border-navy);
+  border-radius: 18px;
+  box-shadow: 0 8px 0 var(--border-navy), 0 16px 30px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==========================================================================
+   1. TOP RETRO CONSOLE HUD
+   ========================================================================== */
+.hud-panel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 12px;
+  background: var(--panel-cream);
+  border-bottom: 2.5px solid var(--border-navy);
+  z-index: 20;
+  gap: 8px;
+}
+
+.hud-item {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 2px solid var(--border-navy);
+  box-shadow: var(--shadow-flat-sm);
+  gap: 6px;
+}
+
+.hud-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hud-label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.hud-value {
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: var(--text-main);
+  font-family: var(--display-font);
+  line-height: 1;
+}
+
+.hud-score .hud-value {
+  color: var(--accent-blue);
+}
+
+.hud-timer .hud-value {
+  color: var(--accent-red);
+}
+
+.hud-progress .hud-value {
+  color: var(--accent-green);
+}
+
+.lives-hearts {
+  display: flex;
+  gap: 3px;
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.lives-hearts .heart {
+  transition: transform 0.15s ease, opacity 0.15s ease;
+  display: inline-block;
+}
+
+.lives-hearts .heart.lost {
+  opacity: 0.25;
+  filter: grayscale(1);
+  transform: scale(0.85);
+}
+
+.hud-nav-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.hud-btn {
+  background: #ffffff;
+  color: var(--text-main);
+  border: 2px solid var(--border-navy);
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-family: var(--primary-font);
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-flat-sm);
+  transition: all 0.1s ease;
+  height: 32px;
+}
+
+.hud-btn:hover {
+  background: #fef08a;
+  transform: translateY(-1px);
+}
+
+.hud-btn:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+.btn-profile {
+  background: #dbeafe;
+}
+
+/* ==========================================================================
+   2. SHOPPING TASK MISSION BAR (Store Notice Banner)
+   ========================================================================== */
+.task-mission-bar {
+  background: #fef08a;
+  border-bottom: 2.5px solid var(--border-navy);
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  z-index: 15;
+}
+
+.task-badge {
+  background: #f59e0b;
+  color: #78350f;
+  font-size: 0.72rem;
+  font-weight: 900;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1.5px solid var(--border-navy);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  box-shadow: 0 1px 0 var(--border-navy);
+}
+
+.task-prompt-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.task-title {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.task-items-checklist {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.task-check-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #ffffff;
+  border: 1.5px solid var(--border-navy);
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: var(--text-main);
+  box-shadow: 0 1px 0 var(--border-navy);
+}
+
+.task-check-pill.completed {
+  background: #dcfce7;
+  border-color: var(--accent-green);
+  color: #15803d;
+}
+
+.task-check-pill .pill-qty {
+  font-weight: 900;
+  color: var(--accent-blue);
+}
+
+.task-check-pill.completed .pill-qty {
+  color: #15803d;
+}
+
+.task-hint-bubble {
+  background: #fee2e2;
+  border: 1.5px solid #dc2626;
+  color: #991b1b;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ==========================================================================
+   3. MAIN SUPERMARKET FLOOR LAYOUT
+   ========================================================================== */
+.supermarket-floor {
+  display: grid;
+  grid-template-columns: 1.28fr 1fr;
+  flex: 1;
+  gap: 10px;
+  padding: 10px;
+  overflow: hidden;
+  background: #e9e2d5;
+}
+
+/* ==========================================================================
+   4. LEFT COLUMN: SUPERMARKET GROCERY SHELVES
+   ========================================================================== */
+.shelves-section {
+  display: flex;
+  flex-direction: column;
+  background: var(--shelf-bg);
+  border-radius: 12px;
+  border: 2.5px solid var(--border-navy);
+  box-shadow: var(--shadow-flat);
+  overflow: hidden;
+}
+
+/* Category Filter Tabs */
+.shelf-category-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 6px 8px;
+  background: var(--panel-cream);
+  border-bottom: 2px solid var(--border-navy);
+  overflow-x: auto;
+}
+
+.cat-tab {
+  background: #ffffff;
+  color: var(--text-main);
+  border: 2px solid var(--border-navy);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-family: var(--primary-font);
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: var(--shadow-flat-sm);
+  transition: all 0.1s ease;
+}
+
+.cat-tab:hover {
+  background: #fef08a;
+  transform: translateY(-1px);
+}
+
+.cat-tab.active {
+  background: var(--accent-blue);
+  color: #ffffff;
+  box-shadow: 0 1px 0 var(--border-navy);
+}
+
+/* Shelves Rack Container (Realistic subtle wooden shelf beams) */
+.shelves-display-rack {
+  flex: 1;
+  padding: 10px 8px;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+  gap: 10px 8px;
+  align-content: start;
+  background: 
+    repeating-linear-gradient(
+      180deg,
+      #f8f5ee 0px,
+      #f8f5ee 82px,
+      #d4a373 82px,
+      #b07d4b 88px,
+      #152234 88px,
+      #152234 90px
+    );
+}
+
+/* Product Shelf Card */
+.product-card {
+  background: #ffffff;
+  border: 2px solid var(--border-navy);
+  border-radius: 10px;
+  padding: 6px 4px 5px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  cursor: pointer;
+  box-shadow: 0 3px 0 var(--border-navy);
+  transition: transform 0.1s ease, border-color 0.1s ease;
+  margin-bottom: 4px;
+}
+
+.product-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 0 var(--border-navy);
+}
+
+.product-card:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 var(--border-navy);
+}
+
+.product-card.in-basket {
+  border-color: var(--accent-green);
+  background: #f0fdf4;
+}
+
+.product-emoji-wrap {
+  font-size: 2rem;
+  line-height: 1;
+  margin: 2px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-name {
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.15;
+  margin-bottom: 3px;
+  min-height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Price Tag Pill */
+.product-price-tag {
+  background: #fef08a;
+  color: #78350f;
+  border: 1.5px solid var(--border-navy);
+  font-size: 0.74rem;
+  font-weight: 900;
+  padding: 1px 6px;
+  border-radius: 6px;
+  margin-bottom: 4px;
+  box-shadow: 0 1px 0 var(--border-navy);
+}
+
+.product-actions {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  width: 100%;
+  justify-content: center;
+}
+
+.btn-shelf-mod {
+  background: var(--accent-blue);
+  color: #ffffff;
+  border: 1.5px solid var(--border-navy);
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  font-size: 0.82rem;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1.5px 0 var(--border-navy);
+  transition: transform 0.08s ease;
+}
+
+.btn-shelf-mod:hover {
+  background: var(--accent-blue-dark);
+}
+
+.btn-shelf-mod.btn-minus {
+  background: #ffffff;
+  color: var(--text-main);
+}
+
+.btn-shelf-mod.btn-minus:hover {
+  background: #fee2e2;
+  color: var(--accent-red);
+}
+
+.product-qty-badge {
+  font-size: 0.78rem;
+  font-weight: 900;
+  color: var(--accent-blue);
+  min-width: 16px;
+}
+
+/* ==========================================================================
+   5. RIGHT COLUMN: SHOPPING BASKET & CASHIER COUNTER
+   ========================================================================== */
+.checkout-station {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+}
+
+/* 1. Shopping Basket Card */
+.shopping-basket-card {
+  background: var(--panel-cream);
+  border-radius: 12px;
+  border: 2.5px solid var(--border-navy);
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: var(--shadow-flat);
+}
+
+.basket-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1.5px solid #e2e8f0;
+  padding-bottom: 4px;
+}
+
+.basket-title-group {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.basket-icon {
+  font-size: 1.05rem;
+}
+
+.basket-heading {
+  font-size: 0.82rem;
+  font-weight: 900;
+  color: var(--text-main);
+  letter-spacing: 0.02em;
+}
+
+.basket-item-count {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--text-dim);
+  background: #ffffff;
+  border: 1.5px solid var(--border-navy);
+  padding: 1px 6px;
+  border-radius: 6px;
+}
+
+.basket-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-height: 90px;
+  overflow-y: auto;
+}
+
+.basket-empty-state {
+  color: var(--text-dim);
+  font-size: 0.74rem;
+  text-align: center;
+  padding: 6px 2px;
+}
+
+.basket-row-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+  padding: 2px 6px;
+  border-radius: 6px;
+  border: 1.5px solid var(--border-navy);
+  font-size: 0.74rem;
+}
+
+.basket-row-info {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.basket-row-emoji {
+  font-size: 0.95rem;
+}
+
+.basket-row-name {
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.basket-row-qty {
+  color: var(--accent-blue);
+  font-weight: 900;
+}
+
+.basket-row-price {
+  font-weight: 900;
+  color: var(--accent-green);
+}
+
+.btn-remove-basket-item {
+  background: transparent;
+  color: var(--accent-red);
+  border: none;
+  font-size: 0.85rem;
+  cursor: pointer;
+  margin-left: 4px;
+  font-weight: 900;
+}
+
+.basket-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #ffffff;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1.5px solid var(--border-navy);
+}
+
+.summary-label {
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: var(--text-dim);
+}
+
+.summary-val {
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: var(--accent-blue);
+}
+
+/* ==========================================================================
+   6. CASH REGISTER / POS TERMINAL (MAIN VISUAL FOCUS)
+   ========================================================================== */
+.cash-register-panel {
+  background: var(--panel-cream);
+  border-radius: 12px;
+  border: 2.5px solid var(--border-navy);
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  box-shadow: var(--shadow-flat);
+}
+
+/* POS Digital Screen Unit (Retro Classic LCD Display) */
+.pos-screen-unit {
+  background: #dcfce7;
+  border: 2.5px solid var(--border-navy);
+  border-radius: 8px;
+  padding: 6px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  box-shadow: inset 0 2px 0 rgba(0, 0, 0, 0.08);
+}
+
+.pos-top-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #166534;
+}
+
+.pos-store-tag {
+  font-family: var(--mono-font);
+  letter-spacing: 0.05em;
+}
+
+.pos-status-tag {
+  background: #bbf7d0;
+  color: #14532d;
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid #166534;
+  font-weight: 900;
+}
+
+.pos-main-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 1px 0;
+}
+
+.pos-total-label {
+  font-size: 0.82rem;
+  font-weight: 900;
+  color: #14532d;
+}
+
+.pos-total-amount {
+  font-size: 1.55rem;
+  font-weight: 900;
+  color: #14532d;
+  font-family: var(--mono-font), var(--display-font);
+  letter-spacing: 0.02em;
+}
+
+.pos-subtotal-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #166534;
+  border-top: 1px dashed #86efac;
+  padding-top: 2px;
+}
+
+/* Malaysian Ringgit (RM) Cash Drawer */
+.rm-cash-drawer {
+  background: #ffffff;
+  border-radius: 10px;
+  border: 2px solid var(--border-navy);
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  box-shadow: 0 2px 0 var(--border-navy);
+}
+
+.drawer-header-strip {
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+  text-align: center;
+}
+
+/* Banknotes Tray */
+.notes-tray {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+}
+
+.money-token {
+  border: none;
+  cursor: pointer;
+  border-radius: 6px;
+  position: relative;
+  transition: transform 0.08s ease;
+}
+
+.money-token:hover {
+  transform: translateY(-2px);
+}
+
+.money-token:active {
+  transform: translateY(1px);
+}
+
+/* Banknote Bills */
+.note-rm {
+  height: 42px;
+  border-radius: 6px;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--border-navy);
+  box-shadow: 0 2px 0 var(--border-navy);
+}
+
+.note-inner {
+  width: 100%;
+  height: 100%;
+  border: 1px dashed rgba(255, 255, 255, 0.75);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1px;
+}
+
+.n-val-top, .n-val-bot {
+  font-size: 0.64rem;
+  font-weight: 900;
+  color: #ffffff;
+  font-family: var(--primary-font);
+  line-height: 1;
+}
+
+.n-label {
+  font-size: 0.52rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.95);
+  line-height: 1;
+}
+
+.note-50 { background: var(--rm50-bg); }
+.note-20 { background: var(--rm20-bg); }
+.note-10 { background: var(--rm10-bg); }
+.note-5  { background: var(--rm5-bg); }
+.note-1  { background: var(--rm1-bg); }
+
+/* Coins Tray */
+.coins-tray {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+  justify-items: center;
+}
+
+.coin-sen {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  border: 2px solid var(--border-navy);
+  box-shadow: 0 2px 0 var(--border-navy);
+}
+
+.coin-50 {
+  background: #f59e0b;
+  color: #78350f;
+}
+
+.coin-20 {
+  background: #fbbf24;
+  color: #78350f;
+  width: 33px;
+  height: 33px;
+}
+
+.coin-10 {
+  background: #e2e8f0;
+  color: #334155;
+  width: 30px;
+  height: 30px;
+}
+
+.coin-5 {
+  background: #cbd5e1;
+  color: #334155;
+  width: 27px;
+  height: 27px;
+}
+
+.c-val {
+  font-size: 0.68rem;
+  font-weight: 900;
+}
+
+.c-sub {
+  font-size: 0.48rem;
+  font-weight: 800;
+}
+
+/* Payment Mat Desk */
+.payment-counter-desk {
+  background: #ffffff;
+  border-radius: 10px;
+  border: 2px solid var(--border-navy);
+  padding: 5px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  box-shadow: 0 2px 0 var(--border-navy);
+}
+
+.payment-mat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mat-title {
+  font-size: 0.7rem;
+  font-weight: 900;
+  color: var(--text-dim);
+}
+
+.mat-amount {
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: var(--accent-blue);
+  font-family: var(--mono-font), var(--display-font);
+}
+
+.payment-mat-items {
+  min-height: 34px;
+  max-height: 56px;
+  overflow-y: auto;
+  background: #f8fafc;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 3px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  align-items: center;
+}
+
+.mat-placeholder {
+  color: #94a3b8;
+  font-size: 0.7rem;
+  font-style: italic;
+  width: 100%;
+  text-align: center;
+}
+
+.tray-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border-navy);
+  font-size: 0.7rem;
+  font-weight: 900;
+  color: #ffffff;
+  box-shadow: 0 1px 0 var(--border-navy);
+}
+
+.tray-chip.chip-rm50 { background: var(--rm50-bg); }
+.tray-chip.chip-rm20 { background: var(--rm20-bg); }
+.tray-chip.chip-rm10 { background: var(--rm10-bg); }
+.tray-chip.chip-rm5  { background: var(--rm5-bg); }
+.tray-chip.chip-rm1  { background: var(--rm1-bg); }
+.tray-chip.chip-coin { background: #f59e0b; color: #78350f; }
+
+.payment-desk-controls {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  gap: 4px;
+}
+
+.btn-desk {
+  border: 2px solid var(--border-navy);
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-family: var(--primary-font);
+  font-size: 0.76rem;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: var(--shadow-flat-sm);
+  transition: all 0.1s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+}
+
+.btn-undo {
+  background: #ffffff;
+  color: var(--text-main);
+}
+
+.btn-undo:hover {
+  background: #f1f5f9;
+}
+
+.btn-clear {
+  background: #fee2e2;
+  color: var(--accent-red);
+}
+
+.btn-clear:hover {
+  background: #fca5a5;
+}
+
+/* Pay & Checkout HERO Button */
+.btn-pay-confirm {
+  background: var(--accent-green);
+  color: #ffffff;
+  font-size: 0.84rem;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+}
+
+.btn-pay-confirm:hover {
+  background: var(--accent-green-dark);
+  transform: translateY(-1px);
+}
+
+.btn-desk:active {
+  transform: translateY(1.5px);
+  box-shadow: none;
+}
+
+/* ==========================================================================
+   7. SUCCESS CHECKOUT POPUP MODAL
+   ========================================================================== */
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(21, 34, 52, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  padding: 16px;
+}
+
+.modal-backdrop.hidden {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.success-card {
+  background: var(--panel-cream);
+  border: 3px solid var(--border-navy);
+  border-radius: 16px;
+  padding: 20px 24px;
+  text-align: center;
+  max-width: 420px;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  box-shadow: var(--shadow-flat-lg), 0 16px 30px rgba(0, 0, 0, 0.4);
+}
+
+.success-badge {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1.5px solid var(--border-navy);
+  font-size: 0.72rem;
+  font-weight: 900;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.success-icon {
+  font-size: 2.6rem;
+  line-height: 1;
+}
+
+.success-title {
+  font-family: var(--display-font);
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: var(--text-main);
+}
+
+.success-details {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  line-height: 1.3;
+}
+
+.success-points-pill {
+  background: #fef08a;
+  color: #78350f;
+  border: 2px solid var(--border-navy);
+  font-size: 0.95rem;
+  font-weight: 900;
+  padding: 4px 14px;
+  border-radius: 10px;
+  box-shadow: var(--shadow-flat-sm);
+}
+
+/* ==========================================================================
+   8. OVERLAYS: START, INSTRUCTIONS, AND END SCREEN
+   ========================================================================== */
+.overlay-screen {
+  position: absolute;
+  inset: 0;
+  background: rgba(21, 34, 52, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  padding: 16px;
+}
+
+.overlay-screen.hidden,
+.hidden {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.overlay-card {
+  background: var(--panel-cream);
+  border: 3px solid var(--border-navy);
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  max-width: 560px;
+  width: 90%;
+  box-shadow: var(--shadow-flat-lg), 0 16px 30px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-main);
+}
+
+.logo-badge {
+  background: #fef08a;
+  border: 1.5px solid var(--border-navy);
+  color: #78350f;
+  font-size: 0.72rem;
+  font-weight: 900;
+  padding: 3px 12px;
+  border-radius: 20px;
+  letter-spacing: 0.05em;
+}
+
+.game-title {
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: var(--text-main);
+  font-family: var(--display-font);
+  line-height: 1;
+}
+
+.title-highlight {
+  color: var(--accent-gold);
+}
+
+.game-subtitle {
+  font-size: 0.86rem;
+  color: var(--text-dim);
+  line-height: 1.35;
+  max-width: 420px;
+}
+
+.character-preview {
+  margin: 2px 0;
+}
+
+.preview-bubbles {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+}
+
+.preview-bubbles .chip {
+  background: #ffffff;
+  border: 1.5px solid var(--border-navy);
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: var(--text-main);
+  box-shadow: 0 1px 0 var(--border-navy);
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+}
+
+.arcade-btn {
+  border: 2px solid var(--border-navy);
+  border-radius: 10px;
+  padding: 9px 24px;
+  font-family: var(--primary-font);
+  font-size: 0.95rem;
+  font-weight: 900;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-flat-btn);
+  transition: all 0.1s ease;
+}
+
+.btn-play {
+  background: var(--accent-green);
+  color: #ffffff;
+}
+
+.btn-play:hover {
+  background: var(--accent-green-dark);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: #ffffff;
+  color: var(--text-main);
+}
+
+.btn-secondary:hover {
+  background: #f1f5f9;
+  transform: translateY(-1px);
+}
+
+.btn-home {
+  background: #fee2e2;
+  color: var(--accent-red);
+}
+
+.btn-home:hover {
+  background: #fca5a5;
+}
+
+.arcade-btn:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+/* How to Play Modal */
+.modal-card {
+  max-width: 580px;
+  text-align: left;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  border-bottom: 2px solid var(--border-navy);
+  padding-bottom: 8px;
+}
+
+.modal-header h2 {
+  font-family: var(--display-font);
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: var(--text-main);
+}
+
+.close-btn {
+  background: #ffffff;
+  border: 2px solid var(--border-navy);
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  font-size: 1rem;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-flat-sm);
+}
+
+.close-btn:hover {
+  background: #fee2e2;
+}
+
+.instructions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+  margin: 6px 0;
+}
+
+.instruction-box {
+  background: #ffffff;
+  border: 1.5px solid var(--border-navy);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  gap: 8px;
+  box-shadow: var(--shadow-flat-sm);
+}
+
+.inst-icon {
+  background: #fef08a;
+  border: 1.5px solid var(--border-navy);
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 0.75rem;
+  color: #78350f;
+  flex-shrink: 0;
+}
+
+.inst-content h3 {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 2px;
+}
+
+.inst-content p {
+  font-size: 0.74rem;
+  color: var(--text-dim);
+  line-height: 1.3;
+}
+
+.modal-play-btn {
+  width: 100%;
+  margin-top: 4px;
+}
+
+/* End of Shift Results Screen */
+.stars-awarded {
+  display: flex;
+  gap: 8px;
+  font-size: 2.6rem;
+  color: #cbd5e1;
+  margin: 4px 0;
+}
+
+.star-slot.earned {
+  color: var(--accent-gold);
+}
+
+.score-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  width: 100%;
+}
+
+.summary-box {
+  background: #ffffff;
+  border: 1.5px solid var(--border-navy);
+  border-radius: 10px;
+  padding: 8px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: var(--shadow-flat-sm);
+}
+
+.summary-box .summary-label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.summary-box .summary-val {
+  font-family: var(--display-font);
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: var(--text-main);
+}
+
+.summary-box .summary-val.highlight {
+  color: var(--accent-blue);
+}
+
+.summary-box .summary-val.highlight-green {
+  color: var(--accent-green);
+}
+
+/* Responsive Styles */
+@media (max-width: 980px) {
+  .supermarket-floor {
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+  }
+  .score-summary-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .instructions-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .hud-panel {
+    padding: 4px 8px;
+  }
+  .hud-item {
+    padding: 3px 6px;
+  }
+}

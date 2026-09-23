@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Math Shop — Numberland Supermarket</title>
+  <meta name="description"
+    content="Shop at the Numberland Supermarket! Pick fresh groceries from the colorful shelves, check your shopping basket, calculate totals in Malaysian Ringgit (RM), and pay using banknotes and coins!">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700;800&family=Outfit:wght@500;600;700;800&family=Share+Tech+Mono&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="shared.css?v=retro2">
+  <link rel="stylesheet" href="style.css?v=retro2">
+</head>
+
+<body>
+  <div id="game-app">
+    <div id="game-container">
+
+      <!-- TOP HUD -->
+      <header id="game-hud" class="hud-panel">
+        <div class="hud-item hud-score">
+          <div class="hud-info">
+            <span class="hud-label">SCORE</span>
+            <span id="score-display" class="hud-value">0</span>
+          </div>
+        </div>
+
+        <div class="hud-item hud-lives">
+          <div class="hud-info">
+            <span class="hud-label">LIVES</span>
+            <div id="lives-container" class="lives-hearts" aria-label="3 lives remaining">
+              <span class="heart active">❤️</span>
+              <span class="heart active">❤️</span>
+              <span class="heart active">❤️</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hud-item hud-timer">
+          <div class="hud-info">
+            <span class="hud-label">TIME</span>
+            <span id="timer-display" class="hud-value">90s</span>
+          </div>
+        </div>
+
+        <div class="hud-item hud-progress">
+          <div class="hud-info">
+            <span class="hud-label">TASK</span>
+            <span id="progress-display" class="hud-value">1 / 10</span>
+          </div>
+        </div>
+
+        <div class="hud-nav-actions">
+          <button id="profile-btn" class="hud-btn btn-profile" title="Explorer Profile">Profile</button>
+          <button id="hud-how-to-play-btn" class="hud-btn" title="How to Play">Rules</button>
+          <button id="sound-toggle-btn" class="hud-btn" title="Toggle Sound">
+            <span id="sound-icon">Sound</span>
+          </button>
+          <a href="index.html" class="hud-btn" title="Back to Numberland">Home</a>
+        </div>
+      </header>
+
+      <!-- SHOPPING TASK MISSION BAR -->
+      <section class="task-mission-bar">
+        <div class="task-badge">🛒 SHOPPING LIST</div>
+        <div class="task-prompt-wrap">
+          <span class="task-title" id="task-title-text">Task 1: Buy 2 Fresh Apples and 1 Orange Juice</span>
+          <div class="task-items-checklist" id="task-checklist">
+            <!-- Dynamic checklist pills e.g. [🍎 Apple x2 (0/2)] [🧃 Juice x1 (0/1)] -->
+          </div>
+        </div>
+        <div class="task-hint-bubble hidden" id="task-hint-box">
+          <span class="hint-icon">💡</span>
+          <span class="hint-text" id="task-hint-text">Hint message will appear here</span>
+        </div>
+      </section>
+
+      <!-- MAIN SUPERMARKET SHOPPING FLOOR -->
+      <main class="supermarket-floor">
+
+        <!-- LEFT COLUMN: SUPERMARKET GROCERY AISLES & SHELVES -->
+        <section class="shelves-section">
+          <!-- Category Filter Bar -->
+          <div class="shelf-category-tabs">
+            <button class="cat-tab active" data-cat="all">All Aisles</button>
+            <button class="cat-tab" data-cat="produce">🍎 Fruits &amp; Veggies</button>
+            <button class="cat-tab" data-cat="bakery">🍞 Bakery &amp; Dairy</button>
+            <button class="cat-tab" data-cat="snacks">🧃 Snacks &amp; Drinks</button>
+          </div>
+
+          <!-- Shelves Display Container -->
+          <div class="shelves-display-rack" id="shelves-grid">
+            <!-- Product items rendered dynamically via JS -->
+          </div>
+        </section>
+
+        <!-- RIGHT COLUMN: SHOPPING BASKET & CASHIER CHECKOUT COUNTER -->
+        <aside class="checkout-station">
+
+          <!-- 1. Cartoon Shopping Basket / Cart -->
+          <div class="shopping-basket-card">
+            <div class="basket-card-header">
+              <div class="basket-title-group">
+                <span class="basket-icon">🧺</span>
+                <span class="basket-heading">YOUR BASKET</span>
+              </div>
+              <span class="basket-item-count" id="basket-item-count">0 items</span>
+            </div>
+
+            <!-- Basket Items Content List -->
+            <div class="basket-items-list" id="basket-items-list">
+              <div class="basket-empty-state">
+                <span>🛒 Click products from the shelves to add them to your basket!</span>
+              </div>
+            </div>
+
+            <!-- Basket Total & Checkout Trigger -->
+            <div class="basket-summary-row">
+              <span class="summary-label">Basket Total:</span>
+              <strong class="summary-val" id="basket-total-text">RM 0.00</strong>
+            </div>
+          </div>
+
+          <!-- 2. Cashier Counter & Cash Register Terminal -->
+          <div class="cash-register-panel">
+
+            <!-- POS Digital Screen -->
+            <div class="pos-screen-unit">
+              <div class="pos-top-status">
+                <span class="pos-store-tag">NUMBERLAND MART POS</span>
+                <span class="pos-status-tag" id="pos-status-badge">AWAITING ITEMS</span>
+              </div>
+              <div class="pos-main-total-row">
+                <span class="pos-total-label">TOTAL DUE:</span>
+                <span class="pos-total-amount" id="pos-total-due">RM 0.00</span>
+              </div>
+              <div class="pos-subtotal-row">
+                <span class="pos-sub-item">Counted: <strong id="pos-paid-amount">RM 0.00</strong></span>
+                <span class="pos-sub-item" id="pos-difference-tag">Needs: <strong>RM 0.00</strong></span>
+              </div>
+            </div>
+
+            <!-- Malaysian Ringgit (RM) Cash Drawer -->
+            <div class="rm-cash-drawer">
+              <div class="drawer-header-strip">
+                <span>💵 CASH DRAWER(RM)</span>
+              </div>
+
+              <!-- Banknotes Tray -->
+              <div class="notes-tray">
+                <!-- RM50 -->
+                <button class="money-token note-rm note-50" data-value="50.00" title="Add RM 50 Banknote">
+                  <div class="note-inner">
+                    <span class="n-val-top">RM50</span>
+                    <span class="n-label">FIFTY</span>
+                    <span class="n-val-bot">RM50</span>
+                  </div>
+                </button>
+                <!-- RM20 -->
+                <button class="money-token note-rm note-20" data-value="20.00" title="Add RM 20 Banknote">
+                  <div class="note-inner">
+                    <span class="n-val-top">RM20</span>
+                    <span class="n-label">TWENTY</span>
+                    <span class="n-val-bot">RM20</span>
+                  </div>
+                </button>
+                <!-- RM10 -->
+                <button class="money-token note-rm note-10" data-value="10.00" title="Add RM 10 Banknote">
+                  <div class="note-inner">
+                    <span class="n-val-top">RM10</span>
+                    <span class="n-label">TEN</span>
+                    <span class="n-val-bot">RM10</span>
+                  </div>
+                </button>
+                <!-- RM5 -->
+                <button class="money-token note-rm note-5" data-value="5.00" title="Add RM 5 Banknote">
+                  <div class="note-inner">
+                    <span class="n-val-top">RM5</span>
+                    <span class="n-label">FIVE</span>
+                    <span class="n-val-bot">RM5</span>
+                  </div>
+                </button>
+                <!-- RM1 -->
+                <button class="money-token note-rm note-1" data-value="1.00" title="Add RM 1 Banknote">
+                  <div class="note-inner">
+                    <span class="n-val-top">RM1</span>
+                    <span class="n-label">ONE</span>
+                    <span class="n-val-bot">RM1</span>
+                  </div>
+                </button>
+              </div>
+
+              <!-- Coins Tray -->
+              <div class="coins-tray">
+                <!-- 50 sen -->
+                <button class="money-token coin-sen coin-50" data-value="0.50" title="Add 50 sen Coin">
+                  <span class="c-val">50¢</span>
+                  <span class="c-sub">sen</span>
+                </button>
+                <!-- 20 sen -->
+                <button class="money-token coin-sen coin-20" data-value="0.20" title="Add 20 sen Coin">
+                  <span class="c-val">20¢</span>
+                  <span class="c-sub">sen</span>
+                </button>
+                <!-- 10 sen -->
+                <button class="money-token coin-sen coin-10" data-value="0.10" title="Add 10 sen Coin">
+                  <span class="c-val">10¢</span>
+                  <span class="c-sub">sen</span>
+                </button>
+                <!-- 5 sen -->
+                <button class="money-token coin-sen coin-5" data-value="0.05" title="Add 5 sen Coin">
+                  <span class="c-val">5¢</span>
+                  <span class="c-sub">sen</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Payment Mat / Tray Desk -->
+            <div class="payment-counter-desk">
+              <div class="payment-mat-header">
+                <span class="mat-title">PAYMENT TRAY:</span>
+                <span class="mat-amount" id="tray-sum-display">RM 0.00</span>
+              </div>
+              <div class="payment-mat-items" id="payment-mat-items">
+                <span class="mat-placeholder">Click notes &amp; coins above to pay the exact total</span>
+              </div>
+              <div class="payment-desk-controls">
+                <button id="btn-undo-money" class="btn-desk btn-undo" title="Remove last added note/coin">↩
+                  Undo</button>
+                <button id="btn-clear-money" class="btn-desk btn-clear" title="Clear all money">🔄 Clear</button>
+                <button id="btn-pay-checkout" class="btn-desk btn-pay-confirm">
+                  <span class="btn-pay-icon">💳</span>
+                  <span>PAY &amp; CHECKOUT</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </aside>
+      </main>
+
+      <!-- SUCCESS CHECKOUT MODAL / POPUP -->
+      <div id="checkout-success-modal" class="modal-backdrop hidden">
+        <div class="success-card">
+          <div class="success-badge">✅ CHECKOUT COMPLETE!</div>
+          <div class="success-icon">🎉</div>
+          <h2 class="success-title" id="success-title">Exact Payment Verified!</h2>
+          <p class="success-details" id="success-details">You paid RM 7.50 for 2 items. Awesome shopping!</p>
+          <div class="success-points-pill" id="success-points">+150 Points!</div>
+          <button id="btn-next-task" class="arcade-btn btn-play">NEXT TASK ▶</button>
+        </div>
+      </div>
+
+      <!-- START SCREEN OVERLAY (WITHOUT RADIANT GLOW) -->
+      <div id="start-screen" class="overlay-screen active">
+        <div class="overlay-card">
+          <div class="logo-badge">STANDARD 3 MATHEMATICS</div>
+          <h1 class="game-title">MATH<span class="title-highlight">SHOP</span></h1>
+          <p class="game-subtitle">Shop fresh groceries, check items off your shopping list, calculate totals, and pay
+            using banknotes and coins!</p>
+
+          <div class="character-preview">
+            <div class="preview-bubbles">
+              <span class="chip">🍎 Grocery Shelves</span>
+              <span class="chip">🧺 Shopping Basket</span>
+              <span class="chip">🇲🇾 Malaysian Ringgit (RM)</span>
+              <span class="chip">💵 Banknotes &amp; Coins</span>
+              <span class="chip">❤️ 3 Lives &amp; Hints</span>
+            </div>
+          </div>
+
+          <div class="action-buttons">
+            <button id="start-game-btn" class="arcade-btn btn-play">START SHOPPING</button>
+            <button id="how-to-play-btn" class="arcade-btn btn-secondary">HOW TO PLAY</button>
+            <a href="index.html" class="arcade-btn btn-home">BACK TO NUMBERLAND</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- HOW TO PLAY INSTRUCTIONS MODAL (WITHOUT RADIANT GLOW) -->
+      <div id="instructions-modal" class="overlay-screen hidden">
+        <div class="overlay-card modal-card">
+          <div class="modal-header">
+            <h2>HOW TO PLAY — SUPERMARKET SHOPPING</h2>
+            <button id="close-instructions-btn" class="close-btn" aria-label="Close instructions">✕</button>
+          </div>
+
+          <div class="instructions-grid">
+            <div class="instruction-box">
+              <div class="inst-icon">01</div>
+              <div class="inst-content">
+                <h3>Read the Shopping List</h3>
+                <p>Check the shopping task at the top (e.g. <em>"Buy 2 Apples and 1 Juice"</em>) to see what items and
+                  quantities to collect.</p>
+              </div>
+            </div>
+
+            <div class="instruction-box">
+              <div class="inst-icon">02</div>
+              <div class="inst-content">
+                <h3>Pick Products From Shelves</h3>
+                <p>Click items on the colorful supermarket shelves to add them into your shopping basket.</p>
+              </div>
+            </div>
+
+            <div class="instruction-box">
+              <div class="inst-icon">03</div>
+              <div class="inst-content">
+                <h3>Check the Total Price (RM)</h3>
+                <p>The cash register calculates the exact total price in Malaysian Ringgit (RM) for all items in your
+                  basket.</p>
+              </div>
+            </div>
+
+            <div class="instruction-box">
+              <div class="inst-icon">04</div>
+              <div class="inst-content">
+                <h3>Pay with Banknotes &amp; Coins</h3>
+                <p>Click RM notes (RM50, RM20, RM10, RM5, RM1) and sen coins to match the total. Pay accurately to earn
+                  points and stars!</p>
+              </div>
+            </div>
+          </div>
+
+          <button id="start-from-instructions-btn" class="arcade-btn btn-play modal-play-btn">
+            LET'S GO SHOPPING!
+          </button>
+        </div>
+      </div>
+
+      <!-- END OF SHIFT RESULTS OVERLAY (WITHOUT RADIANT GLOW) -->
+      <div id="end-screen" class="overlay-screen hidden">
+        <div class="overlay-card">
+          <div class="logo-badge">SHOPPING SPREE COMPLETE</div>
+          <h2 id="end-title" class="game-title">SUPERMARKET CHAMPION!</h2>
+          <p id="end-subtitle" class="game-subtitle">You completed your shopping challenges with great accuracy!</p>
+
+          <div class="stars-awarded" id="stars-container">
+            <span class="star-slot" data-star="1">★</span>
+            <span class="star-slot" data-star="2">★</span>
+            <span class="star-slot" data-star="3">★</span>
+          </div>
+
+          <div class="score-summary-grid">
+            <div class="summary-box">
+              <span class="summary-label">FINAL SCORE</span>
+              <span id="final-score-val" class="summary-val highlight">0</span>
+            </div>
+            <div class="summary-box">
+              <span class="summary-label">TASKS COMPLETED</span>
+              <span id="final-tasks-val" class="summary-val highlight-green">10 / 10</span>
+            </div>
+            <div class="summary-box">
+              <span class="summary-label">REMAINING LIVES</span>
+              <span id="final-lives-val" class="summary-val">3 / 3</span>
+            </div>
+            <div class="summary-box">
+              <span class="summary-label">TOTAL SPENT</span>
+              <span id="final-spent-val" class="summary-val">RM 0.00</span>
+            </div>
+          </div>
+
+          <div class="action-buttons">
+            <button id="play-again-btn" class="arcade-btn btn-play">SHOP AGAIN</button>
+            <a href="index.html" class="arcade-btn btn-home">BACK TO NUMBERLAND</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="shared.js?v=retro3"></script>
+  <script src="game.js?v=retro3"></script>
+</body>
+
+</html>

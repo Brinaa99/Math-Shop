@@ -1,5 +1,5 @@
 /**
- * MATH SHOP — SUPERMARKET SHOPPING & CASHIER ENGINE
+ * MATH SHOP — SUPERMARKET SIMULATION & CASHIER ENGINE
  * Standard 3 Mathematics: Money, Decimals, Pricing & Exact Payment in Malaysian Ringgit (RM)
  */
 
@@ -7,11 +7,11 @@
   'use strict';
 
   // ==========================================================================
-  // 1. SUPERMARKET AUDIO SYNTHESIZER
+  // 1. SUPERMARKET WEBAUDIO SYNTHESIZER
   // ==========================================================================
   class SupermarketAudio {
     constructor() {
-      this.enabled = localStorage.getItem('math_games_sound') !== 'false';
+      this.enabled = true;
       this.ctx = null;
     }
 
@@ -65,7 +65,7 @@
     }
 
     playSuccessFanfare() {
-      const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+      const notes = [523.25, 659.25, 783.99, 1046.50];
       notes.forEach((freq, i) => {
         setTimeout(() => this.playTone(freq, 'sine', 0.15, 0.12), i * 75);
       });
@@ -104,12 +104,12 @@
     { id: 'cereal', name: 'Breakfast Cereal', emoji: '🥣', price: 4.50, category: 'snacks' },
     { id: 'cookies', name: 'Choc Cookies', emoji: '🍪', price: 2.00, category: 'snacks' },
     { id: 'choc', name: 'Chocolate Bar', emoji: '🍫', price: 1.50, category: 'snacks' },
-    { id: 'chips', name: 'Crispy Potato Chips', emoji: '🥔', price: 2.80, category: 'snacks' },
+    { id: 'chips', name: 'Potato Chips', emoji: '🥔', price: 2.80, category: 'snacks' },
     { id: 'honey', name: 'Pure Honey Jar', emoji: '🍯', price: 5.00, category: 'snacks' }
   ];
 
   // ==========================================================================
-  // 3. 10 STANDARD 3 SHOPPING CHALLENGES (MALAYSIAN RINGGIT)
+  // 3. 10 REALISTIC SHOPPING TASKS (MALAYSIAN RINGGIT)
   // ==========================================================================
   const CHALLENGES = [
     {
@@ -223,8 +223,7 @@
   class MathShopGame {
     constructor() {
       this.audio = new SupermarketAudio();
-      
-      // Game metrics
+
       this.score = 0;
       this.lives = 3;
       this.maxLives = 3;
@@ -232,58 +231,64 @@
       this.timeLeft = 90;
       this.timerInterval = null;
       this.isPlaying = false;
+      this.startTime = 0;
       this.totalSpent = 0;
+      this.gameEnded = false;
 
       // Basket & Payment State
-      this.basket = {}; // { apple: 2, juice: 1 }
-      this.paymentTray = []; // Array of money tokens added: [50, 5, 0.50]
+      this.basket = {};
+      this.paymentTray = [];
       this.selectedCategory = 'all';
 
-      // DOM Elements
+      // DOM Cache
       this.dom = {
         scoreDisplay: document.getElementById('score-display'),
         livesContainer: document.getElementById('lives-container'),
         timerDisplay: document.getElementById('timer-display'),
         progressDisplay: document.getElementById('progress-display'),
-        
+
         taskTitleText: document.getElementById('task-title-text'),
         taskChecklist: document.getElementById('task-checklist'),
         taskHintBox: document.getElementById('task-hint-box'),
         taskHintText: document.getElementById('task-hint-text'),
-        
+
         shelvesGrid: document.getElementById('shelves-grid'),
         catTabs: document.querySelectorAll('.cat-tab'),
-        
+
         basketItemCount: document.getElementById('basket-item-count'),
         basketItemsList: document.getElementById('basket-items-list'),
         basketTotalText: document.getElementById('basket-total-text'),
-        
+
+        cashierAvatar: document.getElementById('cashier-avatar'),
+        cashierSpeech: document.getElementById('cashier-speech'),
+
         posStatusBadge: document.getElementById('pos-status-badge'),
         posTotalDue: document.getElementById('pos-total-due'),
         posPaidAmount: document.getElementById('pos-paid-amount'),
         posDifferenceTag: document.getElementById('pos-difference-tag'),
-        
+
         traySumDisplay: document.getElementById('tray-sum-display'),
         paymentMatItems: document.getElementById('payment-mat-items'),
         btnUndoMoney: document.getElementById('btn-undo-money'),
         btnClearMoney: document.getElementById('btn-clear-money'),
         btnPayCheckout: document.getElementById('btn-pay-checkout'),
-        
-        // Modals & Overlays
+
         checkoutSuccessModal: document.getElementById('checkout-success-modal'),
-        successTitle: document.getElementById('success-title'),
-        successDetails: document.getElementById('success-details'),
+        receiptTaskName: document.getElementById('receipt-task-name'),
+        receiptTotalAmount: document.getElementById('receipt-total-amount'),
+        receiptPaidAmount: document.getElementById('receipt-paid-amount'),
         successPoints: document.getElementById('success-points'),
         btnNextTask: document.getElementById('btn-next-task'),
-        
+
         startScreen: document.getElementById('start-screen'),
         startGameBtn: document.getElementById('start-game-btn'),
-        howToPlayBtn: document.getElementById('how-to-play-btn'),
+        howToPlayBtn: document.getElementById('start-how-to-play-btn'),
         hudHowToPlayBtn: document.getElementById('hud-how-to-play-btn'),
+        hudRestartBtn: document.getElementById('hud-restart-btn'),
         instructionsModal: document.getElementById('instructions-modal'),
         closeInstructionsBtn: document.getElementById('close-instructions-btn'),
         startFromInstructionsBtn: document.getElementById('start-from-instructions-btn'),
-        
+
         endScreen: document.getElementById('end-screen'),
         endTitle: document.getElementById('end-title'),
         endSubtitle: document.getElementById('end-subtitle'),
@@ -293,96 +298,170 @@
         finalLivesVal: document.getElementById('final-lives-val'),
         finalSpentVal: document.getElementById('final-spent-val'),
         playAgainBtn: document.getElementById('play-again-btn'),
-        
+
         soundToggleBtn: document.getElementById('sound-toggle-btn'),
-        soundIcon: document.getElementById('sound-icon')
+        soundIcon: document.getElementById('sound-icon'),
+        particlesLayer: document.getElementById('flying-particles-layer')
       };
 
       this.initEvents();
       this.renderShelves();
-      this.updateSoundButton();
     }
 
-    // ==========================================================================
-    // INITIALIZATION & EVENT BINDINGS
-    // ==========================================================================
     initEvents() {
-      // Start & Instructions Navigation
-      this.dom.startGameBtn.addEventListener('click', () => this.startGame());
-      this.dom.howToPlayBtn.addEventListener('click', () => this.showInstructions());
+      if (this.dom.startGameBtn) {
+        this.dom.startGameBtn.addEventListener('click', () => {
+          this.audio.init();
+          this.audio.playClick();
+          this.startGame();
+        });
+      }
+
+      if (this.dom.howToPlayBtn) {
+        this.dom.howToPlayBtn.addEventListener('click', () => this.showInstructions());
+      }
       if (this.dom.hudHowToPlayBtn) {
         this.dom.hudHowToPlayBtn.addEventListener('click', () => this.showInstructions());
       }
-      this.dom.closeInstructionsBtn.addEventListener('click', () => this.hideInstructions());
-      this.dom.startFromInstructionsBtn.addEventListener('click', () => {
-        this.hideInstructions();
-        this.startGame();
-      });
-
-      // Sound Toggle
-      if (this.dom.soundToggleBtn) {
-        this.dom.soundToggleBtn.addEventListener('click', () => {
-          this.audio.enabled = !this.audio.enabled;
-          localStorage.setItem('math_games_sound', this.audio.enabled ? 'true' : 'false');
-          this.updateSoundButton();
+      if (this.dom.closeInstructionsBtn) {
+        this.dom.closeInstructionsBtn.addEventListener('click', () => this.hideInstructions());
+      }
+      if (this.dom.startFromInstructionsBtn) {
+        this.dom.startFromInstructionsBtn.addEventListener('click', () => {
+          this.hideInstructions();
+          this.startGame();
         });
       }
 
-      // Replay
-      this.dom.playAgainBtn.addEventListener('click', () => this.startGame());
-
-      // Next Task
-      this.dom.btnNextTask.addEventListener('click', () => this.proceedToNextTask());
-
-      // Category Tabs
-      this.dom.catTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
+      if (this.dom.hudRestartBtn) {
+        this.dom.hudRestartBtn.addEventListener('click', () => {
           this.audio.playClick();
-          this.dom.catTabs.forEach(t => t.classList.remove('active'));
-          tab.classList.add('active');
-          this.selectedCategory = tab.dataset.cat;
-          this.renderShelves();
+          this.startGame();
         });
-      });
+      }
 
-      // Money Tokens (Notes & Coins)
+      if (this.dom.soundToggleBtn) {
+        this.dom.soundToggleBtn.addEventListener('click', () => {
+          this.audio.enabled = !this.audio.enabled;
+          if (this.dom.soundIcon) {
+            this.dom.soundIcon.textContent = this.audio.enabled ? '🔊 Sound' : '🔇 Muted';
+          }
+        });
+      }
+
+      if (this.dom.playAgainBtn) {
+        this.dom.playAgainBtn.addEventListener('click', () => this.startGame());
+      }
+
+      if (this.dom.btnNextTask) {
+        this.dom.btnNextTask.addEventListener('click', () => this.proceedToNextTask());
+      }
+
+      if (this.dom.catTabs) {
+        this.dom.catTabs.forEach(tab => {
+          tab.addEventListener('click', () => {
+            this.audio.playClick();
+            this.dom.catTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            this.selectedCategory = tab.dataset.cat;
+            this.renderShelves();
+          });
+        });
+      }
+
       document.querySelectorAll('.money-token').forEach(tokenBtn => {
         tokenBtn.addEventListener('click', (e) => {
           const val = parseFloat(tokenBtn.dataset.value);
+          this.animateMoneyFly(tokenBtn);
           this.addMoneyToTray(val);
         });
       });
 
-      // Payment Mat Action Buttons
-      this.dom.btnUndoMoney.addEventListener('click', () => this.undoLastMoney());
-      this.dom.btnClearMoney.addEventListener('click', () => this.clearMoneyTray());
-      this.dom.btnPayCheckout.addEventListener('click', () => this.validateAndCheckout());
+      if (this.dom.btnUndoMoney) {
+        this.dom.btnUndoMoney.addEventListener('click', () => this.undoLastMoney());
+      }
+      if (this.dom.btnClearMoney) {
+        this.dom.btnClearMoney.addEventListener('click', () => this.clearMoneyTray());
+      }
+      if (this.dom.btnPayCheckout) {
+        this.dom.btnPayCheckout.addEventListener('click', () => this.validateAndCheckout());
+      }
     }
 
-    updateSoundButton() {
-      if (this.dom.soundIcon) {
-        this.dom.soundIcon.textContent = this.audio.enabled ? 'Sound: ON' : 'Sound: OFF';
+    setCashierSpeech(text, avatar = '🧑‍💼') {
+      if (this.dom.cashierSpeech) this.dom.cashierSpeech.textContent = text;
+      if (this.dom.cashierAvatar) {
+        const head = this.dom.cashierAvatar.querySelector('.avatar-head');
+        if (head) head.textContent = avatar;
       }
+    }
+
+    animateItemFly(sourceElement, emoji) {
+      if (!this.dom.particlesLayer || !sourceElement) return;
+      const rect = sourceElement.getBoundingClientRect();
+      const basketEl = this.dom.basketItemsList;
+      const targetRect = basketEl ? basketEl.getBoundingClientRect() : { left: window.innerWidth - 150, top: 180 };
+
+      const particle = document.createElement('div');
+      particle.className = 'flying-particle';
+      particle.textContent = emoji;
+      particle.style.left = `${rect.left + rect.width / 2 - 15}px`;
+      particle.style.top = `${rect.top + rect.height / 2 - 15}px`;
+
+      this.dom.particlesLayer.appendChild(particle);
+
+      requestAnimationFrame(() => {
+        particle.style.left = `${targetRect.left + targetRect.width / 2 - 15}px`;
+        particle.style.top = `${targetRect.top + 20}px`;
+        particle.style.transform = 'scale(0.6) rotate(20deg)';
+        particle.style.opacity = '0.2';
+      });
+
+      setTimeout(() => {
+        if (particle.parentNode) particle.parentNode.removeChild(particle);
+      }, 550);
+    }
+
+    animateMoneyFly(sourceElement) {
+      if (!this.dom.particlesLayer || !sourceElement) return;
+      const rect = sourceElement.getBoundingClientRect();
+      const trayEl = this.dom.paymentMatItems;
+      const targetRect = trayEl ? trayEl.getBoundingClientRect() : { left: window.innerWidth - 150, top: 400 };
+
+      const particle = document.createElement('div');
+      particle.className = 'flying-particle';
+      particle.textContent = sourceElement.classList.contains('note-rm') ? '💵' : '🪙';
+      particle.style.left = `${rect.left + rect.width / 2 - 15}px`;
+      particle.style.top = `${rect.top + rect.height / 2 - 15}px`;
+
+      this.dom.particlesLayer.appendChild(particle);
+
+      requestAnimationFrame(() => {
+        particle.style.left = `${targetRect.left + targetRect.width / 2 - 15}px`;
+        particle.style.top = `${targetRect.top + 10}px`;
+        particle.style.transform = 'scale(0.8) rotate(-15deg)';
+        particle.style.opacity = '0.2';
+      });
+
+      setTimeout(() => {
+        if (particle.parentNode) particle.parentNode.removeChild(particle);
+      }, 500);
     }
 
     showInstructions() {
       this.audio.playClick();
-      this.dom.instructionsModal.classList.remove('hidden');
+      if (this.dom.instructionsModal) this.dom.instructionsModal.classList.remove('hidden');
     }
 
     hideInstructions() {
       this.audio.playClick();
-      this.dom.instructionsModal.classList.add('hidden');
+      if (this.dom.instructionsModal) this.dom.instructionsModal.classList.add('hidden');
     }
 
-    // ==========================================================================
-    // GAME CYCLE
-    // ==========================================================================
     startGame() {
-      this.audio.playClick();
-      this.dom.startScreen.classList.add('hidden');
-      this.dom.endScreen.classList.add('hidden');
-      this.dom.checkoutSuccessModal.classList.add('hidden');
+      if (this.dom.startScreen) this.dom.startScreen.classList.add('hidden');
+      if (this.dom.endScreen) this.dom.endScreen.classList.add('hidden');
+      if (this.dom.checkoutSuccessModal) this.dom.checkoutSuccessModal.classList.add('hidden');
 
       this.score = 0;
       this.lives = this.maxLives;
@@ -390,6 +469,8 @@
       this.timeLeft = 90;
       this.totalSpent = 0;
       this.isPlaying = true;
+      this.gameEnded = false;
+      this.startTime = Date.now();
 
       this.updateHUD();
       this.loadTask(this.currentTaskIdx);
@@ -401,7 +482,14 @@
       this.timerInterval = setInterval(() => {
         if (!this.isPlaying) return;
         this.timeLeft--;
-        this.dom.timerDisplay.textContent = `${this.timeLeft}s`;
+        if (this.dom.timerDisplay) {
+          this.dom.timerDisplay.textContent = `${this.timeLeft}s`;
+          if (this.timeLeft <= 10) {
+            this.dom.timerDisplay.style.color = '#ef4444';
+          } else {
+            this.dom.timerDisplay.style.color = '';
+          }
+        }
 
         if (this.timeLeft <= 0) {
           clearInterval(this.timerInterval);
@@ -411,26 +499,24 @@
     }
 
     updateHUD() {
-      this.dom.scoreDisplay.textContent = this.score.toLocaleString();
-      this.dom.timerDisplay.textContent = `${this.timeLeft}s`;
-      this.dom.progressDisplay.textContent = `${this.currentTaskIdx + 1} / ${CHALLENGES.length}`;
+      if (this.dom.scoreDisplay) this.dom.scoreDisplay.textContent = this.score.toLocaleString();
+      if (this.dom.timerDisplay) this.dom.timerDisplay.textContent = `${this.timeLeft}s`;
+      if (this.dom.progressDisplay) this.dom.progressDisplay.textContent = `${this.currentTaskIdx + 1} / ${CHALLENGES.length}`;
 
-      // Update Lives Hearts
-      const hearts = this.dom.livesContainer.querySelectorAll('.heart');
-      hearts.forEach((heart, idx) => {
-        if (idx < this.lives) {
-          heart.classList.remove('lost');
-          heart.classList.add('active');
-        } else {
-          heart.classList.add('lost');
-          heart.classList.remove('active');
-        }
-      });
+      if (this.dom.livesContainer) {
+        const hearts = this.dom.livesContainer.querySelectorAll('.heart');
+        hearts.forEach((heart, idx) => {
+          if (idx < this.lives) {
+            heart.classList.remove('lost');
+            heart.classList.add('active');
+          } else {
+            heart.classList.add('lost');
+            heart.classList.remove('active');
+          }
+        });
+      }
     }
 
-    // ==========================================================================
-    // TASK & SHOPPING MISSION MANAGEMENT
-    // ==========================================================================
     loadTask(taskIndex) {
       if (taskIndex >= CHALLENGES.length) {
         this.endGame(true, 'Supermarket Champion! All 10 challenges completed!');
@@ -442,8 +528,10 @@
       this.paymentTray = [];
       this.hideHint();
 
-      // Update Header prompt
-      this.dom.taskTitleText.textContent = `Task ${task.id}: ${task.title}`;
+      if (this.dom.taskTitleText) {
+        this.dom.taskTitleText.textContent = `Task ${task.id}: ${task.title}`;
+      }
+      this.setCashierSpeech(`"Task ${task.id}: Find the items on your list, then pay RM ${task.targetTotal.toFixed(2)} at the checkout!"`, '🧑‍💼');
       this.renderTaskChecklist();
       this.renderShelves();
       this.renderBasket();
@@ -453,12 +541,16 @@
 
     renderTaskChecklist() {
       const task = CHALLENGES[this.currentTaskIdx];
+      if (!this.dom.taskChecklist) return;
       this.dom.taskChecklist.innerHTML = '';
+
+      let allCollected = true;
 
       task.items.forEach(reqItem => {
         const prod = PRODUCTS.find(p => p.id === reqItem.id);
         const inBasket = this.basket[reqItem.id] || 0;
         const isComplete = inBasket === reqItem.qty;
+        if (!isComplete) allCollected = false;
 
         const pill = document.createElement('div');
         pill.className = `task-check-pill ${isComplete ? 'completed' : ''}`;
@@ -469,21 +561,23 @@
         `;
         this.dom.taskChecklist.appendChild(pill);
       });
+
+      if (allCollected) {
+        this.setCashierSpeech(`"All items collected! Now place exactly RM ${task.targetTotal.toFixed(2)} into the payment tray!"`, '😊');
+      }
     }
 
     showHint(message) {
-      this.dom.taskHintText.textContent = message;
-      this.dom.taskHintBox.classList.remove('hidden');
+      if (this.dom.taskHintText) this.dom.taskHintText.textContent = message;
+      if (this.dom.taskHintBox) this.dom.taskHintBox.classList.remove('hidden');
     }
 
     hideHint() {
-      this.dom.taskHintBox.classList.add('hidden');
+      if (this.dom.taskHintBox) this.dom.taskHintBox.classList.add('hidden');
     }
 
-    // ==========================================================================
-    // SHELF DISPLAY & BASKET LOGIC
-    // ==========================================================================
     renderShelves() {
+      if (!this.dom.shelvesGrid) return;
       this.dom.shelvesGrid.innerHTML = '';
 
       const filtered = PRODUCTS.filter(p => {
@@ -495,7 +589,7 @@
         const qtyInBasket = this.basket[prod.id] || 0;
         const card = document.createElement('div');
         card.className = `product-card ${qtyInBasket > 0 ? 'in-basket' : ''}`;
-        
+
         card.innerHTML = `
           <div class="product-emoji-wrap">${prod.emoji}</div>
           <div class="product-name">${prod.name}</div>
@@ -507,18 +601,16 @@
           </div>
         `;
 
-        // Click card body to add item
         card.addEventListener('click', (e) => {
-          if (e.target.closest('.btn-shelf-mod')) return; // handled by button
-          this.modifyBasketItem(prod.id, 1);
+          if (e.target.closest('.btn-shelf-mod')) return;
+          this.modifyBasketItem(prod.id, 1, card, prod.emoji);
         });
 
-        // Plus and Minus button handles
         const plusBtn = card.querySelector('.btn-plus');
         if (plusBtn) {
           plusBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            this.modifyBasketItem(prod.id, 1);
+            this.modifyBasketItem(prod.id, 1, card, prod.emoji);
           });
         }
 
@@ -526,7 +618,7 @@
         if (minusBtn) {
           minusBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            this.modifyBasketItem(prod.id, -1);
+            this.modifyBasketItem(prod.id, -1, card, prod.emoji);
           });
         }
 
@@ -534,7 +626,7 @@
       });
     }
 
-    modifyBasketItem(productId, delta) {
+    modifyBasketItem(productId, delta, cardEl = null, emoji = '🍎') {
       const current = this.basket[productId] || 0;
       const next = current + delta;
 
@@ -546,6 +638,12 @@
 
       if (delta > 0) {
         this.audio.playLaserScan();
+        this.animateItemFly(cardEl, emoji);
+        if (cardEl) {
+          cardEl.classList.remove('animate-bounce');
+          void cardEl.offsetWidth; // reflow
+          cardEl.classList.add('animate-bounce');
+        }
       } else {
         this.audio.playClick();
       }
@@ -557,6 +655,7 @@
     }
 
     renderBasket() {
+      if (!this.dom.basketItemsList) return;
       this.dom.basketItemsList.innerHTML = '';
       const itemKeys = Object.keys(this.basket);
 
@@ -566,11 +665,12 @@
       if (itemKeys.length === 0) {
         this.dom.basketItemsList.innerHTML = `
           <div class="basket-empty-state">
-            <span>🛒 Click products from the shelves to add them to your basket!</span>
+            <span class="empty-icon">🛒</span>
+            <span>Click items on the shelves to place them in your basket!</span>
           </div>
         `;
-        this.dom.basketItemCount.textContent = '0 items';
-        this.dom.basketTotalText.textContent = 'RM 0.00';
+        if (this.dom.basketItemCount) this.dom.basketItemCount.textContent = '0 items';
+        if (this.dom.basketTotalText) this.dom.basketTotalText.textContent = 'RM 0.00';
         return;
       }
 
@@ -608,13 +708,14 @@
         this.dom.basketItemsList.appendChild(row);
       });
 
-      this.dom.basketItemCount.textContent = `${totalItems} item${totalItems > 1 ? 's' : ''}`;
-      this.dom.basketTotalText.textContent = `RM ${totalRM.toFixed(2)}`;
+      if (this.dom.basketItemCount) {
+        this.dom.basketItemCount.textContent = `${totalItems} item${totalItems > 1 ? 's' : ''}`;
+      }
+      if (this.dom.basketTotalText) {
+        this.dom.basketTotalText.textContent = `RM ${totalRM.toFixed(2)}`;
+      }
     }
 
-    // ==========================================================================
-    // CASH DRAWER & PAYMENT MAT CONTROLLER
-    // ==========================================================================
     addMoneyToTray(value) {
       if (!this.isPlaying) return;
 
@@ -659,34 +760,35 @@
 
     updatePaymentDisplay() {
       const task = CHALLENGES[this.currentTaskIdx];
-      const basketTotal = this.getBasketTotal();
+      if (!task) return;
       const trayTotal = this.getTrayTotal();
 
-      // POS Display
-      this.dom.posTotalDue.textContent = `RM ${task.targetTotal.toFixed(2)}`;
-      this.dom.posPaidAmount.textContent = `RM ${trayTotal.toFixed(2)}`;
-      this.dom.traySumDisplay.textContent = `RM ${trayTotal.toFixed(2)}`;
+      if (this.dom.posTotalDue) this.dom.posTotalDue.textContent = `RM ${task.targetTotal.toFixed(2)}`;
+      if (this.dom.posPaidAmount) this.dom.posPaidAmount.textContent = `RM ${trayTotal.toFixed(2)}`;
+      if (this.dom.traySumDisplay) this.dom.traySumDisplay.textContent = `RM ${trayTotal.toFixed(2)}`;
 
       const diff = Math.round((task.targetTotal - trayTotal) * 100) / 100;
-      if (diff > 0) {
-        this.dom.posDifferenceTag.innerHTML = `Needs: <strong style="color: #f87171;">RM ${diff.toFixed(2)}</strong>`;
-        this.dom.posStatusBadge.textContent = 'READY TO PAY';
-        this.dom.posStatusBadge.style.color = '#34d399';
-      } else if (diff < 0) {
-        this.dom.posDifferenceTag.innerHTML = `Over by: <strong style="color: #fb923c;">RM ${Math.abs(diff).toFixed(2)}</strong>`;
-        this.dom.posStatusBadge.textContent = 'OVERPAID';
-        this.dom.posStatusBadge.style.color = '#fb923c';
-      } else {
-        this.dom.posDifferenceTag.innerHTML = `<strong style="color: #34d399;">EXACT MATCH! ✓</strong>`;
-        this.dom.posStatusBadge.textContent = 'EXACT AMOUNT';
-        this.dom.posStatusBadge.style.color = '#34d399';
+      if (this.dom.posDifferenceTag && this.dom.posStatusBadge) {
+        if (diff > 0) {
+          this.dom.posDifferenceTag.innerHTML = `Needs: <strong style="color: #dc2626;">RM ${diff.toFixed(2)}</strong>`;
+          this.dom.posStatusBadge.textContent = 'READY TO PAY';
+          this.dom.posStatusBadge.style.color = '#15803d';
+        } else if (diff < 0) {
+          this.dom.posDifferenceTag.innerHTML = `Over by: <strong style="color: #ea580c;">RM ${Math.abs(diff).toFixed(2)}</strong>`;
+          this.dom.posStatusBadge.textContent = 'OVERPAID';
+          this.dom.posStatusBadge.style.color = '#ea580c';
+        } else {
+          this.dom.posDifferenceTag.innerHTML = `<strong style="color: #16a34a;">EXACT MATCH! ✓</strong>`;
+          this.dom.posStatusBadge.textContent = 'EXACT MATCH';
+          this.dom.posStatusBadge.style.color = '#16a34a';
+        }
       }
 
-      // Render Mat Chips
+      if (!this.dom.paymentMatItems) return;
       this.dom.paymentMatItems.innerHTML = '';
       if (this.paymentTray.length === 0) {
         this.dom.paymentMatItems.innerHTML = `
-          <span class="mat-placeholder">Click notes &amp; coins above to pay the exact total</span>
+          <span class="mat-placeholder">Click banknotes &amp; coins above to count into payment tray</span>
         `;
         return;
       }
@@ -712,9 +814,6 @@
       });
     }
 
-    // ==========================================================================
-    // CHECKOUT & VALIDATION
-    // ==========================================================================
     validateAndCheckout() {
       if (!this.isPlaying) return;
 
@@ -730,7 +829,6 @@
         }
       }
 
-      // Also ensure no extra unwanted items
       const requestedIds = task.items.map(i => i.id);
       for (const bId of Object.keys(this.basket)) {
         if (!requestedIds.includes(bId)) {
@@ -741,6 +839,7 @@
 
       if (!basketMatches) {
         this.audio.playWrongBuzz();
+        this.setCashierSpeech(`"Your basket doesn't match the shopping list yet! Please check what items are requested."`, '🤔');
         this.showHint(`Please collect the exact items from the shopping list first!`);
         return;
       }
@@ -750,10 +849,8 @@
       const targetTotal = task.targetTotal;
 
       if (trayTotal === targetTotal) {
-        // EXACT PAYMENT SUCCESS!
         this.handleSuccessfulPayment(task, targetTotal);
       } else {
-        // INCORRECT PAYMENT
         this.handleIncorrectPayment(task, trayTotal, targetTotal);
       }
     }
@@ -767,16 +864,13 @@
       this.totalSpent += amount;
 
       this.updateHUD();
+      this.setCashierSpeech(`"Ka-Ching! Exact payment received! Here is your official receipt!"`, '🎉');
 
-      // Show Success Modal
-      this.dom.successTitle.textContent = 'Exact Payment Verified!';
-      this.dom.successDetails.textContent = `You paid RM ${amount.toFixed(2)} accurately for "${task.title}". Great job!`;
-      this.dom.successPoints.textContent = `+${earnedPoints} Points!`;
-      this.dom.checkoutSuccessModal.classList.remove('hidden');
-
-      if (window.NumberlandFeedback) {
-        window.NumberlandFeedback.showFloatingPoints(earnedPoints, window.innerWidth / 2, window.innerHeight / 2);
-      }
+      if (this.dom.receiptTaskName) this.dom.receiptTaskName.textContent = task.title;
+      if (this.dom.receiptTotalAmount) this.dom.receiptTotalAmount.textContent = `RM ${amount.toFixed(2)}`;
+      if (this.dom.receiptPaidAmount) this.dom.receiptPaidAmount.textContent = `RM ${amount.toFixed(2)}`;
+      if (this.dom.successPoints) this.dom.successPoints.textContent = `+${earnedPoints} Points!`;
+      if (this.dom.checkoutSuccessModal) this.dom.checkoutSuccessModal.classList.remove('hidden');
     }
 
     handleIncorrectPayment(task, paid, target) {
@@ -786,18 +880,22 @@
 
       const diff = Math.round((target - paid) * 100) / 100;
       if (paid < target) {
+        this.setCashierSpeech(`"You placed RM ${paid.toFixed(2)}. Total is RM ${target.toFixed(2)} — you need RM ${diff.toFixed(2)} more!"`, '🤔');
         this.showHint(`You placed RM ${paid.toFixed(2)}, but total is RM ${target.toFixed(2)}. You need RM ${diff.toFixed(2)} more! ${task.hint}`);
       } else {
+        this.setCashierSpeech(`"You placed RM ${paid.toFixed(2)}. That's over by RM ${Math.abs(diff).toFixed(2)}!"`, '🤔');
         this.showHint(`You placed RM ${paid.toFixed(2)}. That's over by RM ${Math.abs(diff).toFixed(2)}! ${task.hint}`);
       }
 
       if (this.lives <= 0) {
-        this.endGame(false, 'Out of accuracy lives! Check your change carefully next time.');
+        setTimeout(() => {
+          this.endGame(false, 'Out of accuracy lives! Check your change carefully next time.');
+        }, 1200);
       }
     }
 
     proceedToNextTask() {
-      this.dom.checkoutSuccessModal.classList.add('hidden');
+      if (this.dom.checkoutSuccessModal) this.dom.checkoutSuccessModal.classList.add('hidden');
       this.currentTaskIdx++;
 
       if (this.currentTaskIdx >= CHALLENGES.length) {
@@ -807,17 +905,20 @@
       }
     }
 
-    // ==========================================================================
-    // GAME OVER & RESULTS SCREEN
-    // ==========================================================================
     endGame(completedAll, message) {
+      if (this.gameEnded) return;
+      this.gameEnded = true;
+
       this.isPlaying = false;
       if (this.timerInterval) clearInterval(this.timerInterval);
 
-      this.dom.endTitle.textContent = completedAll ? 'SUPERMARKET CHAMPION!' : 'SHIFT COMPLETED!';
-      this.dom.endSubtitle.textContent = message;
+      if (this.dom.endTitle) {
+        this.dom.endTitle.textContent = completedAll ? 'SUPERMARKET CHAMPION!' : 'SHIFT COMPLETED!';
+      }
+      if (this.dom.endSubtitle) {
+        this.dom.endSubtitle.textContent = message;
+      }
 
-      // Calculate Stars (1 to 3 stars)
       let stars = 1;
       if (completedAll && this.lives === 3) {
         stars = 3;
@@ -827,34 +928,50 @@
         stars = 1;
       }
 
-      const starSlots = this.dom.starsContainer.querySelectorAll('.star-slot');
-      starSlots.forEach((slot, idx) => {
-        if (idx < stars) {
-          slot.classList.add('earned');
-        } else {
-          slot.classList.remove('earned');
-        }
-      });
-
-      // Populate Summary Grid
-      this.dom.finalScoreVal.textContent = this.score.toLocaleString();
-      this.dom.finalTasksVal.textContent = `${Math.min(CHALLENGES.length, this.currentTaskIdx + (completedAll ? 0 : 0))} / ${CHALLENGES.length}`;
-      this.dom.finalLivesVal.textContent = `${this.lives} / ${this.maxLives}`;
-      this.dom.finalSpentVal.textContent = `RM ${this.totalSpent.toFixed(2)}`;
-
-      // Save to Profile
-      if (window.NumberlandProfile) {
-        window.NumberlandProfile.saveGameRecord('math-shop', this.score, stars);
+      if (this.dom.starsContainer) {
+        const starSlots = this.dom.starsContainer.querySelectorAll('.star-slot');
+        starSlots.forEach((slot, idx) => {
+          if (idx < stars) {
+            slot.classList.add('earned');
+          } else {
+            slot.classList.remove('earned');
+          }
+        });
       }
 
-      this.dom.endScreen.classList.remove('hidden');
+      if (this.dom.finalScoreVal) this.dom.finalScoreVal.textContent = this.score.toLocaleString();
+      if (this.dom.finalTasksVal) {
+        this.dom.finalTasksVal.textContent = `${Math.min(CHALLENGES.length, this.currentTaskIdx + (completedAll ? 0 : 0))} / ${CHALLENGES.length}`;
+      }
+      if (this.dom.finalLivesVal) this.dom.finalLivesVal.textContent = `${this.lives} / ${this.maxLives}`;
+      if (this.dom.finalSpentVal) this.dom.finalSpentVal.textContent = `RM ${this.totalSpent.toFixed(2)}`;
+
+      const timeTaken = Math.max(1, Math.round((Date.now() - this.startTime) / 1000));
+
+      // StuCent runtime contract integration
+      if (window.game && typeof window.game.end === 'function') {
+        const targetMax = (window.game.config && window.game.config.maxPoints) || 100;
+        const normalizedScore = Math.min(targetMax, Math.round((this.score / 2000) * targetMax));
+        window.game.end({
+          score: normalizedScore,
+          maxScore: targetMax,
+          timeTaken: timeTaken,
+          success: completedAll || stars >= 1
+        });
+      }
+
+      if (this.dom.endScreen) this.dom.endScreen.classList.remove('hidden');
     }
   }
 
-  // ==========================================================================
-  // INITIALIZE ON DOM READY
-  // ==========================================================================
+  // Initialize StuCent runtime game contract
+  window.game = window.game || {};
+  window.game.init = function(config) {
+    window.game.config = config || {};
+  };
+
   document.addEventListener('DOMContentLoaded', () => {
-    window.game = new MathShopGame();
+    new MathShopGame();
   });
+
 })();

@@ -1,60 +1,67 @@
 /* ==========================================================================
-   NUMBERLAND — MATH SHOP (SUPERMARKET GAME)
-   Standard 3 Mathematics: Malaysian Ringgit (RM), Money & Cashier
-   Theme: Light Retro Game Console + Children's Supermarket Game
-   Visual Style: Medium/light navy background, cream panels, dark navy borders,
-                 chunky retro typography, tactile buttons, no glowing effects.
+   MATH SHOP — SUPERMARKET SIMULATION & CASHIER GAME
+   Visual Style: Approved Lighter Retro Game-Console Style
+   Color Palette: Medium Navy Canvas (#2c3e55), Cream Panels (#fdfbf7),
+                  Dark Navy Outlines (#152234), Warm Yellow (#f59e0b),
+                  Vibrant Orange (#ea580c), Fresh Green (#16a34a),
+                  and Rich Blue (#2563eb).
    ========================================================================== */
 
 :root {
   --primary-font: 'Fredoka', 'Outfit', system-ui, -apple-system, sans-serif;
-  --display-font: 'Fredoka', 'Outfit', system-ui, sans-serif;
-  --mono-font: 'Share Tech Mono', 'Press Start 2P', monospace;
+  --display-font: 'Fredoka', cursive, system-ui, sans-serif;
+  --mono-font: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
 
   /* Retro Console & Supermarket Palette */
-  --bg-navy: #2d3f57;              /* Medium/Light Navy Game Background */
-  --bg-navy-surface: #3a506d;      /* Lighter Blue-Gray Texture */
-  --border-navy: #152234;          /* Dark Navy Console Outlines */
-  --panel-cream: #fdfbf7;          /* Primary Cream Off-White Panel */
-  --panel-cream-dark: #f5efe4;     /* Secondary Inset Cream */
-  --panel-cream-tint: #ede6d8;     /* Inset Shadow Cream */
+  --bg-navy: #2d3f57;
+  --bg-navy-surface: #3b506e;
+  --border-navy: #152234;
+  --border-navy-dark: #0f1826;
+  --panel-cream: #fdfbf7;
+  --panel-cream-dark: #f5eee2;
+  --panel-cream-tint: #ede4d3;
 
-  /* Supermarket Shelf Colors */
-  --shelf-bg: #f9f6f0;
-  --shelf-wood: #d4a373;
-  --shelf-beam: #b07d4b;
-  --shelf-border: #152234;
+  /* Supermarket Shelving Materials */
+  --shelf-bg: #f9f7f2;
+  --shelf-wood: #d9a066;
+  --shelf-beam: #b3783e;
+  --shelf-groove: #8c5825;
 
   /* High Contrast Typography */
-  --text-main: #132238;            /* Deep Navy for readability */
-  --text-dim: #5a6e85;             /* Secondary Slate Navy */
+  --text-main: #132238;
+  --text-dim: #5c6f84;
+  --text-muted: #8494a5;
   --text-white: #ffffff;
 
-  /* Bright Controlled Accents (No Neon, No Glow) */
-  --accent-gold: #f59e0b;          /* Coins, Highlights */
-  --accent-green: #16a34a;         /* Checkout, Correct, Success */
+  /* Bright Controlled Accents (No Neon, No Blurry Glow) */
+  --accent-gold: #f59e0b;
+  --accent-gold-light: #fef08a;
+  --accent-green: #16a34a;
   --accent-green-dark: #15803d;
-  --accent-blue: #2563eb;          /* Controls, Numbers */
+  --accent-green-light: #dcfce7;
+  --accent-blue: #2563eb;
   --accent-blue-dark: #1d4ed8;
-  --accent-red: #dc2626;           /* Mistakes, Undo/Clear, Lost Lives */
-  --accent-orange: #ea580c;        /* Shopping Accents */
+  --accent-blue-light: #dbeafe;
+  --accent-red: #dc2626;
+  --accent-red-light: #fee2e2;
+  --accent-orange: #ea580c;
+  --accent-orange-light: #ffedd5;
   --accent-purple: #7c3aed;
 
   /* Malaysian Ringgit (RM) Banknotes Palette */
-  --rm50-bg: #0284c7;              /* RM50 Cyan/Blue */
-  --rm20-bg: #ea580c;              /* RM20 Orange */
-  --rm10-bg: #dc2626;              /* RM10 Red */
-  --rm5-bg: #16a34a;               /* RM5 Green */
-  --rm1-bg: #2563eb;               /* RM1 Blue */
+  --rm50-bg: #0284c7;
+  --rm20-bg: #ea580c;
+  --rm10-bg: #dc2626;
+  --rm5-bg: #16a34a;
+  --rm1-bg: #2563eb;
 
-  /* Flat 3D Offset Drop Shadows (No Soft Blurred Glow) */
+  /* Flat 3D Offset Drop Shadows */
   --shadow-flat: 0 4px 0 var(--border-navy);
   --shadow-flat-sm: 0 2px 0 var(--border-navy);
   --shadow-flat-btn: 0 3px 0 var(--border-navy);
-  --shadow-flat-lg: 0 8px 0 var(--border-navy);
+  --shadow-flat-lg: 0 6px 0 var(--border-navy);
 }
 
-/* Global Reset & Base */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -69,8 +76,8 @@ body, html {
   overflow: hidden;
   background-color: var(--bg-navy);
   background-image: 
-    radial-gradient(var(--bg-navy-surface) 1px, transparent 1px),
-    radial-gradient(var(--bg-navy-surface) 1px, var(--bg-navy) 1px);
+    radial-gradient(var(--bg-navy-surface) 1.5px, transparent 1.5px),
+    radial-gradient(var(--bg-navy-surface) 1.5px, var(--bg-navy) 1.5px);
   background-size: 24px 24px;
   background-position: 0 0, 12px 12px;
   font-family: var(--primary-font);
@@ -78,6 +85,7 @@ body, html {
   align-items: center;
   justify-content: center;
   color: var(--text-main);
+  line-height: 1.3;
 }
 
 #game-app {
@@ -91,13 +99,15 @@ body, html {
   padding: 8px;
 }
 
-/* Main Supermarket Cabinet Frame (Solid Retro Console Chassis) */
+/* ==========================================================================
+   MAIN CABINET / APP CONTAINER
+   ========================================================================== */
 #game-container {
-  width: min(97vw, 1380px);
-  height: min(96vh, 900px);
-  min-height: 600px;
+  width: min(98vw, 1360px);
+  height: min(97vh, 900px);
+  min-height: 590px;
   position: relative;
-  background: #ede7dc;
+  background: var(--panel-cream-dark);
   border: 3px solid var(--border-navy);
   border-radius: 18px;
   box-shadow: 0 8px 0 var(--border-navy), 0 16px 30px rgba(0, 0, 0, 0.35);
@@ -105,6 +115,34 @@ body, html {
   display: flex;
   flex-direction: column;
 }
+
+/* ==========================================================================
+   0. SUPERMARKET STRIPED AWNING ROOF
+   ========================================================================== */
+.market-awning {
+  width: 100%;
+  height: 10px;
+  background: var(--border-navy);
+  overflow: hidden;
+  border-bottom: 2px solid var(--border-navy);
+  flex-shrink: 0;
+}
+
+.awning-stripes {
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
+.awning-stripes .stripe {
+  flex: 1;
+  height: 100%;
+}
+
+.stripe-cream  { background: #fffdf5; }
+.stripe-orange { background: #f97316; }
+.stripe-blue   { background: #3b82f6; }
+.stripe-green  { background: #22c55e; }
 
 /* ==========================================================================
    1. TOP RETRO CONSOLE HUD
@@ -118,9 +156,44 @@ body, html {
   border-bottom: 2.5px solid var(--border-navy);
   z-index: 20;
   gap: 8px;
+  flex-shrink: 0;
 }
 
-.hud-item {
+.hud-brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 2px solid var(--border-navy);
+  box-shadow: var(--shadow-flat-sm);
+}
+
+.brand-icon {
+  font-size: 1.15rem;
+}
+
+.brand-title {
+  font-family: var(--display-font);
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: var(--text-main);
+  letter-spacing: 0.03em;
+}
+
+.brand-accent {
+  color: var(--accent-orange);
+}
+
+.hud-stats-cluster {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.hud-pill {
   display: flex;
   align-items: center;
   background: #ffffff;
@@ -131,39 +204,25 @@ body, html {
   gap: 6px;
 }
 
-.hud-info {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.hud-label {
-  font-size: 0.65rem;
+.hud-pill-label {
+  font-size: 0.64rem;
   font-weight: 800;
   letter-spacing: 0.06em;
   color: var(--text-dim);
   text-transform: uppercase;
 }
 
-.hud-value {
+.hud-pill-value {
   font-size: 1.05rem;
   font-weight: 900;
   color: var(--text-main);
-  font-family: var(--display-font);
   line-height: 1;
+  font-family: var(--primary-font);
 }
 
-.hud-score .hud-value {
-  color: var(--accent-blue);
-}
-
-.hud-timer .hud-value {
-  color: var(--accent-red);
-}
-
-.hud-progress .hud-value {
-  color: var(--accent-green);
-}
+.hud-score .hud-pill-value { color: #d97706; }
+.hud-timer .hud-pill-value { color: #dc2626; font-family: var(--mono-font); }
+.hud-progress .hud-pill-value { color: #2563eb; }
 
 .lives-hearts {
   display: flex;
@@ -178,52 +237,53 @@ body, html {
 }
 
 .lives-hearts .heart.lost {
-  opacity: 0.25;
+  opacity: 0.22;
   filter: grayscale(1);
   transform: scale(0.85);
 }
 
-.hud-nav-actions {
+.hud-actions {
   display: flex;
   gap: 6px;
   align-items: center;
 }
 
-.hud-btn {
+.hud-action-btn {
   background: #ffffff;
   color: var(--text-main);
   border: 2px solid var(--border-navy);
-  padding: 4px 10px;
+  padding: 4px 12px;
   border-radius: 8px;
   font-family: var(--primary-font);
   font-size: 0.8rem;
   font-weight: 800;
   cursor: pointer;
-  text-decoration: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   box-shadow: var(--shadow-flat-sm);
   transition: all 0.1s ease;
   height: 32px;
+  touch-action: manipulation;
 }
 
-.hud-btn:hover {
-  background: #fef08a;
+.hud-action-btn:hover {
+  background: var(--accent-gold-light);
   transform: translateY(-1px);
 }
 
-.hud-btn:active {
+.hud-action-btn:active {
   transform: translateY(2px);
   box-shadow: none;
 }
 
-.btn-profile {
-  background: #dbeafe;
+.restart-btn {
+  padding: 4px 8px;
+  font-size: 0.95rem;
 }
 
 /* ==========================================================================
-   2. SHOPPING TASK MISSION BAR (Store Notice Banner)
+   2. SHOPPING TASK MISSION BAR (Clipboard List)
    ========================================================================== */
 .task-mission-bar {
   background: #fef08a;
@@ -234,9 +294,10 @@ body, html {
   gap: 10px;
   flex-wrap: wrap;
   z-index: 15;
+  flex-shrink: 0;
 }
 
-.task-badge {
+.clipboard-tag {
   background: #f59e0b;
   color: #78350f;
   font-size: 0.72rem;
@@ -246,7 +307,10 @@ body, html {
   border: 1.5px solid var(--border-navy);
   letter-spacing: 0.04em;
   white-space: nowrap;
-  box-shadow: 0 1px 0 var(--border-navy);
+  box-shadow: 0 1.5px 0 var(--border-navy);
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .task-prompt-wrap {
@@ -281,6 +345,7 @@ body, html {
   font-weight: 800;
   color: var(--text-main);
   box-shadow: 0 1px 0 var(--border-navy);
+  transition: all 0.15s ease;
 }
 
 .task-check-pill.completed {
@@ -309,6 +374,13 @@ body, html {
   display: flex;
   align-items: center;
   gap: 6px;
+  animation: hintShake 0.3s ease;
+}
+
+@keyframes hintShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
 }
 
 /* ==========================================================================
@@ -321,11 +393,11 @@ body, html {
   gap: 10px;
   padding: 10px;
   overflow: hidden;
-  background: #e9e2d5;
+  background: #ece5d8;
 }
 
 /* ==========================================================================
-   4. LEFT COLUMN: SUPERMARKET GROCERY SHELVES
+   4. LEFT COLUMN: SUPERMARKET GROCERY AISLES & SHELVES
    ========================================================================== */
 .shelves-section {
   display: flex;
@@ -345,6 +417,7 @@ body, html {
   background: var(--panel-cream);
   border-bottom: 2px solid var(--border-navy);
   overflow-x: auto;
+  flex-shrink: 0;
 }
 
 .cat-tab {
@@ -360,10 +433,14 @@ body, html {
   white-space: nowrap;
   box-shadow: var(--shadow-flat-sm);
   transition: all 0.1s ease;
+  touch-action: manipulation;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .cat-tab:hover {
-  background: #fef08a;
+  background: var(--accent-gold-light);
   transform: translateY(-1px);
 }
 
@@ -373,24 +450,41 @@ body, html {
   box-shadow: 0 1px 0 var(--border-navy);
 }
 
-/* Shelves Rack Container (Realistic subtle wooden shelf beams) */
+.shelves-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f1ebd9;
+  border-bottom: 2px solid var(--border-navy);
+  padding: 3px 10px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.shelf-title-label {
+  color: #475569;
+}
+
+/* Shelves Rack Container */
 .shelves-display-rack {
   flex: 1;
   padding: 10px 8px;
   overflow-y: auto;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(122px, 1fr));
   gap: 10px 8px;
   align-content: start;
   background: 
     repeating-linear-gradient(
       180deg,
-      #f8f5ee 0px,
-      #f8f5ee 82px,
-      #d4a373 82px,
-      #b07d4b 88px,
-      #152234 88px,
-      #152234 90px
+      #fcfaf6 0px,
+      #fcfaf6 88px,
+      #d9a066 88px,
+      #b3783e 94px,
+      #152234 94px,
+      #152234 96px
     );
 }
 
@@ -407,7 +501,7 @@ body, html {
   position: relative;
   cursor: pointer;
   box-shadow: 0 3px 0 var(--border-navy);
-  transition: transform 0.1s ease, border-color 0.1s ease;
+  transition: transform 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
   margin-bottom: 4px;
 }
 
@@ -426,8 +520,18 @@ body, html {
   background: #f0fdf4;
 }
 
+.product-card.animate-bounce {
+  animation: productPop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes productPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+
 .product-emoji-wrap {
-  font-size: 2rem;
+  font-size: 2.2rem;
   line-height: 1;
   margin: 2px 0;
   display: flex;
@@ -436,7 +540,7 @@ body, html {
 }
 
 .product-name {
-  font-size: 0.74rem;
+  font-size: 0.76rem;
   font-weight: 800;
   color: var(--text-main);
   line-height: 1.15;
@@ -458,6 +562,7 @@ body, html {
   border-radius: 6px;
   margin-bottom: 4px;
   box-shadow: 0 1px 0 var(--border-navy);
+  font-family: var(--primary-font);
 }
 
 .product-actions {
@@ -472,10 +577,10 @@ body, html {
   background: var(--accent-blue);
   color: #ffffff;
   border: 1.5px solid var(--border-navy);
-  width: 22px;
-  height: 22px;
-  border-radius: 5px;
-  font-size: 0.82rem;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  font-size: 0.88rem;
   font-weight: 900;
   cursor: pointer;
   display: flex;
@@ -483,6 +588,7 @@ body, html {
   justify-content: center;
   box-shadow: 0 1.5px 0 var(--border-navy);
   transition: transform 0.08s ease;
+  touch-action: manipulation;
 }
 
 .btn-shelf-mod:hover {
@@ -500,10 +606,10 @@ body, html {
 }
 
 .product-qty-badge {
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 900;
   color: var(--accent-blue);
-  min-width: 16px;
+  min-width: 18px;
 }
 
 /* ==========================================================================
@@ -526,6 +632,7 @@ body, html {
   flex-direction: column;
   gap: 6px;
   box-shadow: var(--shadow-flat);
+  flex-shrink: 0;
 }
 
 .basket-card-header {
@@ -543,7 +650,7 @@ body, html {
 }
 
 .basket-icon {
-  font-size: 1.05rem;
+  font-size: 1.15rem;
 }
 
 .basket-heading {
@@ -567,7 +674,7 @@ body, html {
   display: flex;
   flex-direction: column;
   gap: 3px;
-  max-height: 90px;
+  max-height: 88px;
   overflow-y: auto;
 }
 
@@ -576,6 +683,10 @@ body, html {
   font-size: 0.74rem;
   text-align: center;
   padding: 6px 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
 .basket-row-item {
@@ -583,7 +694,7 @@ body, html {
   align-items: center;
   justify-content: space-between;
   background: #ffffff;
-  padding: 2px 6px;
+  padding: 3px 6px;
   border-radius: 6px;
   border: 1.5px solid var(--border-navy);
   font-size: 0.74rem;
@@ -622,6 +733,7 @@ body, html {
   cursor: pointer;
   margin-left: 4px;
   font-weight: 900;
+  padding: 0 2px;
 }
 
 .basket-summary-row {
@@ -647,7 +759,7 @@ body, html {
 }
 
 /* ==========================================================================
-   6. CASH REGISTER / POS TERMINAL (MAIN VISUAL FOCUS)
+   6. CASH REGISTER & CASHIER TERMINAL
    ========================================================================== */
 .cash-register-panel {
   background: var(--panel-cream);
@@ -656,8 +768,52 @@ body, html {
   padding: 8px 10px;
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 6px;
   box-shadow: var(--shadow-flat);
+}
+
+/* Cashier Benny Bay */
+.cashier-bay {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  border: 2px solid var(--border-navy);
+  border-radius: 8px;
+  padding: 4px 8px;
+  box-shadow: var(--shadow-flat-sm);
+}
+
+.cashier-avatar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.avatar-head {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.avatar-badge {
+  font-size: 0.52rem;
+  font-weight: 900;
+  background: var(--accent-gold);
+  color: #78350f;
+  padding: 0 4px;
+  border-radius: 4px;
+  border: 1px solid var(--border-navy);
+  letter-spacing: 0.04em;
+  margin-top: 1px;
+}
+
+.cashier-bubble {
+  flex: 1;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.25;
 }
 
 /* POS Digital Screen Unit (Retro Classic LCD Display) */
@@ -712,7 +868,7 @@ body, html {
   font-size: 1.55rem;
   font-weight: 900;
   color: #14532d;
-  font-family: var(--mono-font), var(--display-font);
+  font-family: var(--mono-font);
   letter-spacing: 0.02em;
 }
 
@@ -759,6 +915,8 @@ body, html {
   border-radius: 6px;
   position: relative;
   transition: transform 0.08s ease;
+  touch-action: manipulation;
+  font-family: var(--primary-font);
 }
 
 .money-token:hover {
@@ -797,15 +955,14 @@ body, html {
   font-size: 0.64rem;
   font-weight: 900;
   color: #ffffff;
-  font-family: var(--primary-font);
-  line-height: 1;
+  font-family: var(--mono-font);
 }
 
 .n-label {
   font-size: 0.52rem;
   font-weight: 800;
-  color: rgba(255, 255, 255, 0.95);
-  line-height: 1;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 0.04em;
 }
 
 .note-50 { background: var(--rm50-bg); }
@@ -818,65 +975,54 @@ body, html {
 .coins-tray {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 5px;
+  gap: 6px;
   justify-items: center;
+  padding: 2px 4px;
 }
 
 .coin-sen {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
+  border: 2px solid var(--border-navy);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  line-height: 1;
-  border: 2px solid var(--border-navy);
   box-shadow: 0 2px 0 var(--border-navy);
+  line-height: 1;
 }
 
-.coin-50 {
-  background: #f59e0b;
-  color: #78350f;
+.coin-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
-.coin-20 {
-  background: #fbbf24;
-  color: #78350f;
-  width: 33px;
-  height: 33px;
-}
-
-.coin-10 {
-  background: #e2e8f0;
-  color: #334155;
-  width: 30px;
-  height: 30px;
-}
-
-.coin-5 {
-  background: #cbd5e1;
-  color: #334155;
-  width: 27px;
-  height: 27px;
-}
+.coin-50 { background: radial-gradient(circle, #fde047 30%, #eab308 100%); color: #713f12; }
+.coin-20 { background: radial-gradient(circle, #fef08a 30%, #facc15 100%); color: #713f12; }
+.coin-10 { background: radial-gradient(circle, #f1f5f9 30%, #cbd5e1 100%); color: #334155; }
+.coin-5  { background: radial-gradient(circle, #fed7aa 30%, #fb923c 100%); color: #7c2d12; }
 
 .c-val {
-  font-size: 0.68rem;
+  font-size: 0.74rem;
   font-weight: 900;
+  font-family: var(--mono-font);
 }
 
 .c-sub {
   font-size: 0.48rem;
   font-weight: 800;
+  text-transform: uppercase;
 }
 
-/* Payment Mat Desk */
+/* Payment Mat / Tray Desk */
 .payment-counter-desk {
   background: #ffffff;
   border-radius: 10px;
   border: 2px solid var(--border-navy);
-  padding: 5px 8px;
+  padding: 6px 8px;
   display: flex;
   flex-direction: column;
   gap: 5px;
@@ -889,9 +1035,19 @@ body, html {
   align-items: center;
 }
 
+.mat-title-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mat-icon {
+  font-size: 0.85rem;
+}
+
 .mat-title {
   font-size: 0.7rem;
-  font-weight: 900;
+  font-weight: 800;
   color: var(--text-dim);
 }
 
@@ -899,71 +1055,83 @@ body, html {
   font-size: 1.05rem;
   font-weight: 900;
   color: var(--accent-blue);
-  font-family: var(--mono-font), var(--display-font);
+  font-family: var(--mono-font);
 }
 
 .payment-mat-items {
-  min-height: 34px;
-  max-height: 56px;
-  overflow-y: auto;
-  background: #f8fafc;
-  border: 1.5px solid #cbd5e1;
+  background: #f1f5f9;
+  border: 1.5px dashed var(--border-navy);
   border-radius: 6px;
-  padding: 3px;
+  min-height: 38px;
+  padding: 4px;
   display: flex;
+  gap: 4px;
   flex-wrap: wrap;
-  gap: 3px;
   align-items: center;
 }
 
 .mat-placeholder {
-  color: #94a3b8;
   font-size: 0.7rem;
-  font-style: italic;
-  width: 100%;
+  color: var(--text-dim);
   text-align: center;
+  width: 100%;
 }
 
 .tray-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
   padding: 2px 6px;
   border-radius: 4px;
-  border: 1px solid var(--border-navy);
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 900;
   color: #ffffff;
+  border: 1px solid var(--border-navy);
   box-shadow: 0 1px 0 var(--border-navy);
+  animation: chipDrop 0.15s ease-out;
+  font-family: var(--mono-font);
 }
 
-.tray-chip.chip-rm50 { background: var(--rm50-bg); }
-.tray-chip.chip-rm20 { background: var(--rm20-bg); }
-.tray-chip.chip-rm10 { background: var(--rm10-bg); }
-.tray-chip.chip-rm5  { background: var(--rm5-bg); }
-.tray-chip.chip-rm1  { background: var(--rm1-bg); }
-.tray-chip.chip-coin { background: #f59e0b; color: #78350f; }
+@keyframes chipDrop {
+  from { transform: scale(0.7) translateY(-4px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.chip-rm50 { background: var(--rm50-bg); }
+.chip-rm20 { background: var(--rm20-bg); }
+.chip-rm10 { background: var(--rm10-bg); }
+.chip-rm5  { background: var(--rm5-bg); }
+.chip-rm1  { background: var(--rm1-bg); }
+.chip-coin { background: #f59e0b; color: #78350f; }
 
 .payment-desk-controls {
   display: grid;
-  grid-template-columns: auto auto 1fr;
+  grid-template-columns: 1fr 1fr 2fr;
   gap: 4px;
+  margin-top: 2px;
 }
 
 .btn-desk {
   border: 2px solid var(--border-navy);
-  border-radius: 6px;
-  padding: 5px 8px;
+  border-radius: 8px;
+  padding: 6px 8px;
   font-family: var(--primary-font);
-  font-size: 0.76rem;
+  font-size: 0.8rem;
   font-weight: 900;
   cursor: pointer;
-  box-shadow: var(--shadow-flat-sm);
+  box-shadow: 0 2px 0 var(--border-navy);
   transition: all 0.1s ease;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 4px;
+  touch-action: manipulation;
+}
+
+.btn-desk:hover {
+  transform: translateY(-1px);
+}
+
+.btn-desk:active {
+  transform: translateY(2px);
+  box-shadow: none;
 }
 
 .btn-undo {
@@ -971,115 +1139,149 @@ body, html {
   color: var(--text-main);
 }
 
-.btn-undo:hover {
-  background: #f1f5f9;
-}
-
 .btn-clear {
   background: #fee2e2;
   color: var(--accent-red);
 }
 
-.btn-clear:hover {
-  background: #fca5a5;
-}
-
-/* Pay & Checkout HERO Button */
 .btn-pay-confirm {
   background: var(--accent-green);
   color: #ffffff;
-  font-size: 0.84rem;
-  font-weight: 900;
-  letter-spacing: 0.02em;
 }
 
 .btn-pay-confirm:hover {
   background: var(--accent-green-dark);
-  transform: translateY(-1px);
-}
-
-.btn-desk:active {
-  transform: translateY(1.5px);
-  box-shadow: none;
 }
 
 /* ==========================================================================
-   7. SUCCESS CHECKOUT POPUP MODAL
+   7. SUCCESS CHECKOUT RECEIPT MODAL
    ========================================================================== */
 .modal-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(21, 34, 52, 0.85);
+  background: rgba(21, 34, 52, 0.75);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 50;
+  z-index: 40;
   padding: 16px;
 }
 
-.modal-backdrop.hidden {
-  display: none !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
-}
-
 .success-card {
-  background: var(--panel-cream);
-  border: 3px solid var(--border-navy);
-  border-radius: 16px;
-  padding: 20px 24px;
-  text-align: center;
-  max-width: 420px;
-  width: 90%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  box-shadow: var(--shadow-flat-lg), 0 16px 30px rgba(0, 0, 0, 0.4);
+  gap: 12px;
+  width: min(90%, 420px);
 }
 
-.success-badge {
-  background: #dcfce7;
-  color: #15803d;
-  border: 1.5px solid var(--border-navy);
-  font-size: 0.72rem;
-  font-weight: 900;
-  padding: 3px 10px;
-  border-radius: 20px;
+.receipt-paper {
+  background: #fffef8;
+  border: 3px solid var(--border-navy);
+  border-radius: 12px;
+  padding: 16px 20px;
+  width: 100%;
+  box-shadow: 0 8px 0 var(--border-navy), 0 16px 30px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
 }
 
-.success-icon {
-  font-size: 2.6rem;
-  line-height: 1;
+.receipt-header {
+  text-align: center;
 }
 
-.success-title {
-  font-family: var(--display-font);
-  font-size: 1.3rem;
+.receipt-logo {
+  font-size: 1.1rem;
   font-weight: 900;
   color: var(--text-main);
 }
 
-.success-details {
-  font-size: 0.85rem;
+.receipt-subtitle {
+  font-size: 0.65rem;
+  font-weight: 800;
   color: var(--text-dim);
-  line-height: 1.3;
+  letter-spacing: 0.05em;
+}
+
+.receipt-divider {
+  font-family: var(--mono-font);
+  font-size: 0.7rem;
+  color: #94a3b8;
+  text-align: center;
+  margin: 3px 0;
+}
+
+.receipt-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.82rem;
+  position: relative;
+}
+
+.receipt-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text-main);
+}
+
+.receipt-stamp {
+  position: absolute;
+  right: 10px;
+  bottom: 12px;
+  border: 3px solid #dc2626;
+  color: #dc2626;
+  padding: 2px 10px;
+  border-radius: 6px;
+  font-weight: 900;
+  font-size: 1.1rem;
+  transform: rotate(-12deg);
+  letter-spacing: 0.08em;
+  opacity: 0.9;
+  pointer-events: none;
+  animation: stampSlam 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes stampSlam {
+  from { transform: scale(2) rotate(-30deg); opacity: 0; }
+  to { transform: scale(1) rotate(-12deg); opacity: 0.9; }
+}
+
+.receipt-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
 }
 
 .success-points-pill {
   background: #fef08a;
-  color: #78350f;
   border: 2px solid var(--border-navy);
-  font-size: 0.95rem;
+  color: #854d0e;
+  font-size: 1.15rem;
   font-weight: 900;
-  padding: 4px 14px;
+  padding: 4px 16px;
   border-radius: 10px;
-  box-shadow: var(--shadow-flat-sm);
+  box-shadow: 0 2px 0 var(--border-navy);
+}
+
+.receipt-thanks {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  text-align: center;
+}
+
+.next-task-btn {
+  width: 100%;
 }
 
 /* ==========================================================================
-   8. OVERLAYS: START, INSTRUCTIONS, AND END SCREEN
+   8. OVERLAY SCREENS (START & END SCREENS)
    ========================================================================== */
 .overlay-screen {
   position: absolute;
@@ -1092,23 +1294,14 @@ body, html {
   padding: 16px;
 }
 
-.overlay-screen.hidden,
-.hidden {
-  display: none !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
-}
-
 .overlay-card {
   background: var(--panel-cream);
   border: 3px solid var(--border-navy);
   border-radius: 16px;
   padding: 24px;
+  width: min(90%, 540px);
   text-align: center;
-  max-width: 560px;
-  width: 90%;
-  box-shadow: var(--shadow-flat-lg), 0 16px 30px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 0 var(--border-navy), 0 16px 30px rgba(0, 0, 0, 0.4);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1119,7 +1312,7 @@ body, html {
 .logo-badge {
   background: #fef08a;
   border: 1.5px solid var(--border-navy);
-  color: #78350f;
+  color: #854d0e;
   font-size: 0.72rem;
   font-weight: 900;
   padding: 3px 12px;
@@ -1128,44 +1321,55 @@ body, html {
 }
 
 .game-title {
-  font-size: 2.2rem;
+  font-size: 2.3rem;
   font-weight: 900;
   color: var(--text-main);
-  font-family: var(--display-font);
   line-height: 1;
 }
 
 .title-highlight {
-  color: var(--accent-gold);
+  color: var(--accent-blue);
 }
 
 .game-subtitle {
-  font-size: 0.86rem;
+  font-size: 0.88rem;
   color: var(--text-dim);
   line-height: 1.35;
-  max-width: 420px;
+  max-width: 440px;
 }
 
-.character-preview {
-  margin: 2px 0;
+.feature-highlights {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  width: 100%;
+  margin: 4px 0;
 }
 
-.preview-bubbles {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 6px;
-}
-
-.preview-bubbles .chip {
+.feature-card {
   background: #ffffff;
   border: 1.5px solid var(--border-navy);
-  padding: 4px 10px;
   border-radius: 8px;
-  font-size: 0.76rem;
-  font-weight: 800;
+  padding: 8px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  box-shadow: 0 2px 0 var(--border-navy);
+}
+
+.feature-card .f-icon {
+  font-size: 1.4rem;
+}
+
+.feature-card strong {
+  font-size: 0.75rem;
   color: var(--text-main);
-  box-shadow: 0 1px 0 var(--border-navy);
+}
+
+.feature-card span {
+  font-size: 0.65rem;
+  color: var(--text-dim);
 }
 
 .action-buttons {
@@ -1179,17 +1383,18 @@ body, html {
 .arcade-btn {
   border: 2px solid var(--border-navy);
   border-radius: 10px;
-  padding: 9px 24px;
+  padding: 10px 24px;
+  min-height: 44px;
   font-family: var(--primary-font);
   font-size: 0.95rem;
   font-weight: 900;
   cursor: pointer;
-  text-decoration: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--shadow-flat-btn);
-  transition: all 0.1s ease;
+  box-shadow: 0 3px 0 var(--border-navy);
+  transition: all 0.12s ease;
+  touch-action: manipulation;
 }
 
 .btn-play {
@@ -1212,21 +1417,14 @@ body, html {
   transform: translateY(-1px);
 }
 
-.btn-home {
-  background: #fee2e2;
-  color: var(--accent-red);
-}
-
-.btn-home:hover {
-  background: #fca5a5;
-}
-
 .arcade-btn:active {
   transform: translateY(2px);
   box-shadow: none;
 }
 
-/* How to Play Modal */
+/* ==========================================================================
+   9. HOW TO PLAY MODAL
+   ========================================================================== */
 .modal-card {
   max-width: 580px;
   text-align: left;
@@ -1242,7 +1440,6 @@ body, html {
 }
 
 .modal-header h2 {
-  font-family: var(--display-font);
   font-size: 1.35rem;
   font-weight: 900;
   color: var(--text-main);
@@ -1252,15 +1449,16 @@ body, html {
   background: #ffffff;
   border: 2px solid var(--border-navy);
   border-radius: 8px;
-  width: 32px;
-  height: 32px;
-  font-size: 1rem;
+  width: 34px;
+  height: 34px;
+  font-size: 1.1rem;
   font-weight: 900;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--shadow-flat-sm);
+  box-shadow: 0 2px 0 var(--border-navy);
+  touch-action: manipulation;
 }
 
 .close-btn:hover {
@@ -1272,7 +1470,7 @@ body, html {
   grid-template-columns: 1fr 1fr;
   gap: 10px;
   width: 100%;
-  margin: 6px 0;
+  margin: 8px 0;
 }
 
 .instruction-box {
@@ -1282,7 +1480,7 @@ body, html {
   padding: 10px;
   display: flex;
   gap: 8px;
-  box-shadow: var(--shadow-flat-sm);
+  box-shadow: 0 2px 0 var(--border-navy);
 }
 
 .inst-icon {
@@ -1296,19 +1494,19 @@ body, html {
   justify-content: center;
   font-weight: 900;
   font-size: 0.75rem;
-  color: #78350f;
+  color: #854d0e;
   flex-shrink: 0;
 }
 
 .inst-content h3 {
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   font-weight: 800;
   color: var(--text-main);
   margin-bottom: 2px;
 }
 
 .inst-content p {
-  font-size: 0.74rem;
+  font-size: 0.75rem;
   color: var(--text-dim);
   line-height: 1.3;
 }
@@ -1318,7 +1516,9 @@ body, html {
   margin-top: 4px;
 }
 
-/* End of Shift Results Screen */
+/* ==========================================================================
+   10. END SCREEN & SUMMARY
+   ========================================================================== */
 .stars-awarded {
   display: flex;
   gap: 8px;
@@ -1333,7 +1533,7 @@ body, html {
 
 .score-summary-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: 1fr 1fr;
   gap: 8px;
   width: 100%;
 }
@@ -1342,54 +1542,92 @@ body, html {
   background: #ffffff;
   border: 1.5px solid var(--border-navy);
   border-radius: 10px;
-  padding: 8px 4px;
+  padding: 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-shadow: var(--shadow-flat-sm);
+  box-shadow: 0 2px 0 var(--border-navy);
 }
 
-.summary-box .summary-label {
+.summary-label {
   font-size: 0.65rem;
   font-weight: 800;
   color: var(--text-dim);
   text-transform: uppercase;
 }
 
-.summary-box .summary-val {
-  font-family: var(--display-font);
-  font-size: 1.15rem;
+.summary-val {
+  font-size: 1.2rem;
   font-weight: 900;
   color: var(--text-main);
 }
 
-.summary-box .summary-val.highlight {
-  color: var(--accent-blue);
+.summary-val.highlight {
+  color: var(--accent-gold);
 }
 
-.summary-box .summary-val.highlight-green {
+.summary-val.highlight-green {
   color: var(--accent-green);
 }
 
-/* Responsive Styles */
-@media (max-width: 980px) {
+.particles-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.flying-particle {
+  position: absolute;
+  font-size: 1.8rem;
+  pointer-events: none;
+  transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.hidden {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* ==========================================================================
+   11. RESPONSIVE BREAKPOINTS
+   ========================================================================== */
+@media (max-width: 900px) {
   .supermarket-floor {
     grid-template-columns: 1fr;
     overflow-y: auto;
   }
-  .score-summary-grid {
-    grid-template-columns: 1fr 1fr;
+  .shelves-display-rack {
+    min-height: 240px;
+  }
+  .hud-stats-cluster {
+    gap: 4px;
+  }
+  .hud-pill {
+    padding: 3px 6px;
   }
   .instructions-grid {
     grid-template-columns: 1fr;
   }
 }
 
-@media (max-width: 768px) {
-  .hud-panel {
-    padding: 4px 8px;
+@media (max-width: 600px) {
+  #game-app {
+    padding: 0;
   }
-  .hud-item {
-    padding: 3px 6px;
+  #game-container {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+    border: none;
+  }
+  .hud-panel {
+    padding: 4px 6px;
+  }
+  .hud-brand {
+    display: none;
   }
 }

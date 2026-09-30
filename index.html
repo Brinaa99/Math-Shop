@@ -3,94 +3,72 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Math Shop — Supermarket Shopping &amp; Cashier Game</title>
-  <meta name="description" content="Play the interactive supermarket math game! Pick fresh groceries from the aisles, check your shopping basket, calculate totals in Malaysian Ringgit (RM), and pay using banknotes and coins!">
-  <!-- Google Fonts for Chunky Retro-Game Console Styling -->
+  <title>Numberland Math Shop — Supermarket Math Adventure</title>
+  <meta name="description" content="Shop for groceries, calculate totals and pay with Malaysian Ringgit in an arcade supermarket simulation.">
+  
+  <!-- Playful Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700;800;900&family=Outfit:wght@500;700;800;900&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+  
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div id="game-app">
     <div id="game-container">
 
-      <!-- TOP SUPERMARKET AWNING ROOF -->
-      <div class="market-awning">
-        <div class="awning-stripes">
-          <span class="stripe stripe-cream"></span>
-          <span class="stripe stripe-orange"></span>
-          <span class="stripe stripe-cream"></span>
-          <span class="stripe stripe-blue"></span>
-          <span class="stripe stripe-cream"></span>
-          <span class="stripe stripe-green"></span>
-          <span class="stripe stripe-cream"></span>
-          <span class="stripe stripe-orange"></span>
-          <span class="stripe stripe-cream"></span>
-          <span class="stripe stripe-blue"></span>
-          <span class="stripe stripe-cream"></span>
-          <span class="stripe stripe-green"></span>
-          <span class="stripe stripe-cream"></span>
-          <span class="stripe stripe-orange"></span>
-        </div>
-      </div>
-
       <!-- TOP RETRO CONSOLE HUD -->
       <header id="game-hud" class="hud-panel">
-        <div class="hud-brand">
-          <span class="brand-icon">🛒</span>
-          <span class="brand-title">MATH<span class="brand-accent">SHOP</span></span>
-        </div>
-
-        <div class="hud-stats-cluster">
-          <div class="hud-pill hud-score">
-            <span class="hud-pill-label">SCORE</span>
-            <span id="score-display" class="hud-pill-value">0</span>
+        <div class="hud-left">
+          <div class="brand-badge">
+            <span class="brand-text">MATH<span class="brand-pop">SHOP</span></span>
           </div>
-
-          <div class="hud-pill hud-lives">
-            <span class="hud-pill-label">LIVES</span>
+          <div class="hud-stat-pill hud-score">
+            <span class="hud-label">SCORE</span>
+            <span id="score-display" class="hud-value font-mono">000000</span>
+          </div>
+          <div class="hud-stat-pill hud-lives">
+            <span class="hud-label">LIVES</span>
             <div id="lives-container" class="lives-hearts" aria-label="3 lives remaining">
-              <span class="heart active">❤️</span>
-              <span class="heart active">❤️</span>
-              <span class="heart active">❤️</span>
+              <svg class="heart-icon active" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+              <svg class="heart-icon active" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+              <svg class="heart-icon active" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
             </div>
           </div>
+        </div>
 
-          <div class="hud-pill hud-timer">
-            <span class="hud-pill-label">TIME</span>
-            <span id="timer-display" class="hud-pill-value">90s</span>
+        <div class="hud-center">
+          <div class="hud-stat-pill hud-timer">
+            <span class="hud-label">TIME</span>
+            <span id="timer-display" class="hud-value font-mono">090</span>
           </div>
-
-          <div class="hud-pill hud-progress">
-            <span class="hud-pill-label">TASK</span>
-            <span id="progress-display" class="hud-pill-value">1 / 10</span>
+          <div class="hud-stat-pill hud-task">
+            <span class="hud-label">TASK</span>
+            <span id="progress-display" class="hud-value font-mono">01 / 10</span>
           </div>
         </div>
 
-        <div class="hud-actions">
-          <button id="hud-how-to-play-btn" class="hud-action-btn" title="Game Rules">Rules</button>
-          <button id="sound-toggle-btn" class="hud-action-btn sound-btn" title="Toggle Sound">
-            <span id="sound-icon">🔊 Sound</span>
-          </button>
-          <button id="hud-restart-btn" class="hud-action-btn restart-btn" title="Restart Game">🔄</button>
+        <div class="hud-right">
+          <button id="hud-how-to-play-btn" class="hud-btn btn-secondary">RULES</button>
+          <button id="sound-toggle-btn" class="hud-btn btn-sound">SOUND ON</button>
+          <button id="hud-restart-btn" class="hud-btn btn-restart" title="Restart Game">RESET</button>
         </div>
       </header>
 
-      <!-- SHOPPING TASK MISSION CLIPBOARD -->
+      <!-- SHOPPING TASK MISSION BAR (Clipboard List) -->
       <section class="task-mission-bar">
         <div class="clipboard-tag">
-          <span class="clip-icon">📋</span>
+          <svg class="clip-svg" viewBox="0 0 24 24"><path fill="currentColor" d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
           <span>SHOPPING LIST</span>
         </div>
         <div class="task-prompt-wrap">
           <span class="task-title" id="task-title-text">Task 1: Buy 2 Fresh Apples</span>
           <div class="task-items-checklist" id="task-checklist">
-            <!-- Dynamic checklist pills e.g. [🍎 Apple x2 (0/2)] -->
+            <!-- Dynamic checklist pills rendered via JS -->
           </div>
         </div>
         <div class="task-hint-bubble hidden" id="task-hint-box">
-          <span class="hint-icon">💡</span>
+          <span class="hint-prefix">HINT:</span>
           <span class="hint-text" id="task-hint-text">Hint message</span>
         </div>
       </section>
@@ -102,24 +80,16 @@
         <section class="shelves-section">
           <!-- Aisle Category Filter Tabs -->
           <div class="shelf-category-tabs">
-            <button class="cat-tab active" data-cat="all">
-              <span class="tab-emoji">🏪</span> All Aisles
-            </button>
-            <button class="cat-tab" data-cat="produce">
-              <span class="tab-emoji">🍎</span> Fruits &amp; Veggies
-            </button>
-            <button class="cat-tab" data-cat="bakery">
-              <span class="tab-emoji">🍞</span> Bakery &amp; Dairy
-            </button>
-            <button class="cat-tab" data-cat="snacks">
-              <span class="tab-emoji">🧃</span> Snacks &amp; Drinks
-            </button>
+            <button class="cat-tab active" data-cat="all">All Aisles</button>
+            <button class="cat-tab" data-cat="produce">Fruits &amp; Veggies</button>
+            <button class="cat-tab" data-cat="bakery">Bakery &amp; Dairy</button>
+            <button class="cat-tab" data-cat="snacks">Snacks &amp; Drinks</button>
           </div>
 
           <!-- Shelves Header Strip -->
           <div class="shelves-header-bar">
-            <span class="shelf-title-label">📦 GROCERY SHELVES (TAP ITEMS TO ADD TO BASKET)</span>
-            <span class="shelf-instruction">Click <strong>+</strong> or <strong>-</strong> to adjust</span>
+            <span class="shelf-title-label">GROCERY SHELVES — TAP ITEMS TO ADD TO BASKET</span>
+            <span class="shelf-instruction">Use <strong>+</strong> or <strong>-</strong> to adjust</span>
           </div>
 
           <!-- Shelves Display Container -->
@@ -135,7 +105,7 @@
           <div class="shopping-basket-card">
             <div class="basket-card-header">
               <div class="basket-title-group">
-                <span class="basket-icon">🧺</span>
+                <svg class="basket-svg-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm7 17H5V8h14v12zm-7-8c-1.66 0-3-1.34-3-3H7c0 2.76 2.24 5 5 5s5-2.24 5-5h-2c0 1.66-1.34 3-3 3z"/></svg>
                 <span class="basket-heading">YOUR BASKET</span>
               </div>
               <span class="basket-item-count" id="basket-item-count">0 items</span>
@@ -144,25 +114,33 @@
             <!-- Basket Visual Item Bay -->
             <div class="basket-items-list" id="basket-items-list">
               <div class="basket-empty-state">
-                <span class="empty-icon">🛒</span>
-                <span>Click items on the shelves to place them in your basket!</span>
+                <span>Select grocery items on shelves to place them into your basket</span>
               </div>
             </div>
 
             <!-- Basket Subtotal Bar -->
             <div class="basket-summary-row">
-              <span class="summary-label">Basket Value:</span>
-              <strong class="summary-val" id="basket-total-text">RM 0.00</strong>
+              <span class="summary-label">Basket Total:</span>
+              <strong class="summary-val font-mono" id="basket-total-text">RM 0.00</strong>
             </div>
           </div>
 
           <!-- 2. Cash Register & Cashier Terminal -->
           <div class="cash-register-panel">
 
-            <!-- Cashier Benny Dialog Bar -->
+            <!-- Cashier Dialog Bar -->
             <div class="cashier-bay">
               <div class="cashier-avatar" id="cashier-avatar">
-                <div class="avatar-head">🧑‍💼</div>
+                <div class="avatar-head">
+                  <svg class="cashier-vector-head" viewBox="0 0 40 40">
+                    <circle cx="20" cy="20" r="16" fill="#fcd34d" stroke="#1e3a6a" stroke-width="2"/>
+                    <path d="M10 14 Q20 8 30 14 L32 18 L8 18 Z" fill="#2563eb" stroke="#1e3a6a" stroke-width="1.5"/>
+                    <rect x="6" y="16" width="28" height="3" rx="1.5" fill="#f59e0b"/>
+                    <circle cx="15" cy="22" r="2.2" fill="#0f172a"/>
+                    <circle cx="25" cy="22" r="2.2" fill="#0f172a"/>
+                    <path d="M16 28 Q20 32 24 28" stroke="#0f172a" stroke-width="2" fill="none" stroke-linecap="round"/>
+                  </svg>
+                </div>
                 <div class="avatar-badge">CASHIER</div>
               </div>
               <div class="cashier-bubble" id="cashier-bubble">
@@ -173,23 +151,23 @@
             <!-- POS Digital LCD Screen -->
             <div class="pos-screen-unit">
               <div class="pos-top-status">
-                <span class="pos-store-tag">🇲🇾 NUMBERLAND MART POS-88</span>
+                <span class="pos-store-tag">NUMBERLAND MART POS-88</span>
                 <span class="pos-status-tag" id="pos-status-badge">AWAITING PAYMENT</span>
               </div>
               <div class="pos-main-total-row">
                 <span class="pos-total-label">TOTAL DUE:</span>
-                <span class="pos-total-amount" id="pos-total-due">RM 0.00</span>
+                <span class="pos-total-amount font-mono" id="pos-total-due">RM 0.00</span>
               </div>
               <div class="pos-subtotal-row">
-                <span class="pos-sub-item">In Tray: <strong id="pos-paid-amount">RM 0.00</strong></span>
-                <span class="pos-sub-item" id="pos-difference-tag">Needs: <strong>RM 0.00</strong></span>
+                <span class="pos-sub-item">In Tray: <strong id="pos-paid-amount" class="font-mono">RM 0.00</strong></span>
+                <span class="pos-sub-item" id="pos-difference-tag">Needs: <strong class="font-mono">RM 0.00</strong></span>
               </div>
             </div>
 
             <!-- Malaysian Ringgit (RM) Cash Drawer -->
             <div class="rm-cash-drawer">
               <div class="drawer-header-strip">
-                <span>💵 CASH DRAWER — SELECT MALAYSIAN RINGGIT &amp; SEN</span>
+                <span>CASH DRAWER — MALAYSIAN RINGGIT (RM) &amp; SEN</span>
               </div>
 
               <!-- Banknotes Tray -->
@@ -241,29 +219,29 @@
                 <!-- 50 sen -->
                 <button class="money-token coin-sen coin-50" data-value="0.50" title="Add 50 sen Coin">
                   <div class="coin-inner">
-                    <span class="c-val">50¢</span>
-                    <span class="c-sub">sen</span>
+                    <span class="c-val">50c</span>
+                    <span class="c-sub">SEN</span>
                   </div>
                 </button>
                 <!-- 20 sen -->
                 <button class="money-token coin-sen coin-20" data-value="0.20" title="Add 20 sen Coin">
                   <div class="coin-inner">
-                    <span class="c-val">20¢</span>
-                    <span class="c-sub">sen</span>
+                    <span class="c-val">20c</span>
+                    <span class="c-sub">SEN</span>
                   </div>
                 </button>
                 <!-- 10 sen -->
                 <button class="money-token coin-sen coin-10" data-value="0.10" title="Add 10 sen Coin">
                   <div class="coin-inner">
-                    <span class="c-val">10¢</span>
-                    <span class="c-sub">sen</span>
+                    <span class="c-val">10c</span>
+                    <span class="c-sub">SEN</span>
                   </div>
                 </button>
                 <!-- 5 sen -->
                 <button class="money-token coin-sen coin-5" data-value="0.05" title="Add 5 sen Coin">
                   <div class="coin-inner">
-                    <span class="c-val">5¢</span>
-                    <span class="c-sub">sen</span>
+                    <span class="c-val">5c</span>
+                    <span class="c-sub">SEN</span>
                   </div>
                 </button>
               </div>
@@ -273,19 +251,18 @@
             <div class="payment-counter-desk">
               <div class="payment-mat-header">
                 <div class="mat-title-group">
-                  <span class="mat-icon">📥</span>
                   <span class="mat-title">PAYMENT TRAY:</span>
                 </div>
-                <span class="mat-amount" id="tray-sum-display">RM 0.00</span>
+                <span class="mat-amount font-mono" id="tray-sum-display">RM 0.00</span>
               </div>
               <div class="payment-mat-items" id="payment-mat-items">
-                <span class="mat-placeholder">Click banknotes &amp; coins above to count into payment tray</span>
+                <span class="mat-placeholder">Select banknotes and coins above to place into tray</span>
               </div>
               <div class="payment-desk-controls">
-                <button id="btn-undo-money" class="btn-desk btn-undo" title="Remove last added note/coin">↩ Undo</button>
-                <button id="btn-clear-money" class="btn-desk btn-clear" title="Clear payment tray">🔄 Clear</button>
+                <button id="btn-undo-money" class="btn-desk btn-undo" title="Remove last added note/coin">UNDO</button>
+                <button id="btn-clear-money" class="btn-desk btn-clear" title="Clear payment tray">CLEAR</button>
                 <button id="btn-pay-checkout" class="btn-desk btn-pay-confirm">
-                  <span>💳 PAY &amp; CHECKOUT</span>
+                  <span>PAY &amp; CHECKOUT</span>
                 </button>
               </div>
             </div>
@@ -299,7 +276,7 @@
         <div class="success-card">
           <div class="receipt-paper">
             <div class="receipt-header">
-              <div class="receipt-logo">🏪 NUMBERLAND MART</div>
+              <div class="receipt-logo">NUMBERLAND MART</div>
               <div class="receipt-subtitle">OFFICIAL CASH REGISTER RECEIPT</div>
               <div class="receipt-divider">================================</div>
             </div>
@@ -311,27 +288,27 @@
               </div>
               <div class="receipt-row">
                 <span>Total Amount:</span>
-                <strong id="receipt-total-amount">RM 4.00</strong>
+                <strong id="receipt-total-amount" class="font-mono">RM 4.00</strong>
               </div>
               <div class="receipt-row">
                 <span>Amount Paid:</span>
-                <strong id="receipt-paid-amount" style="color: #15803d;">RM 4.00</strong>
+                <strong id="receipt-paid-amount" class="font-mono" style="color: #10b981;">RM 4.00</strong>
               </div>
               <div class="receipt-row">
                 <span>Payment Status:</span>
-                <strong style="color: #15803d;">EXACT MATCH ✓</strong>
+                <strong style="color: #10b981;">EXACT MATCH</strong>
               </div>
               <div class="receipt-divider">--------------------------------</div>
               <div class="receipt-stamp">PAID IN FULL</div>
             </div>
 
             <div class="receipt-footer">
-              <div class="success-points-pill" id="success-points">+150 Points!</div>
+              <div class="success-points-pill font-mono" id="success-points">+150 PTS</div>
               <p class="receipt-thanks">Thank you for shopping at Numberland Mart!</p>
             </div>
           </div>
 
-          <button id="btn-next-task" class="arcade-btn btn-play next-task-btn">NEXT SHOPPING TASK ▶</button>
+          <button id="btn-next-task" class="arcade-btn btn-play next-task-btn">NEXT SHOPPING TASK</button>
         </div>
       </div>
 
@@ -340,23 +317,29 @@
         <div class="overlay-card">
           <div class="logo-badge">SUPERMARKET SIMULATION</div>
           <h1 class="game-title">MATH<span class="title-highlight">SHOP</span></h1>
-          <p class="game-subtitle">Welcome to Numberland Mart! Explore the grocery shelves, pack your shopping basket according to the shopping list, calculate totals, and pay using Malaysian Ringgit notes and coins!</p>
+          <p class="game-subtitle">Explore grocery aisles, collect items matching your shopping list, calculate total costs, and pay exact Malaysian Ringgit notes and coins!</p>
 
           <div class="feature-highlights">
             <div class="feature-card">
-              <span class="f-icon">🍎</span>
+              <div class="feature-vector-icon">
+                <svg viewBox="0 0 32 32" class="feat-svg"><circle cx="16" cy="18" r="11" fill="#ef4444"/><path d="M16 7 Q18 3 22 4" stroke="#15803d" stroke-width="2.5" fill="none" stroke-linecap="round"/><ellipse cx="14" cy="14" rx="2" ry="4" fill="#fca5a5" transform="rotate(-20 14 14)"/></svg>
+              </div>
               <strong>Pick Groceries</strong>
               <span>Explore fresh aisles</span>
             </div>
             <div class="feature-card">
-              <span class="f-icon">🧺</span>
+              <div class="feature-vector-icon">
+                <svg viewBox="0 0 32 32" class="feat-svg"><path d="M6 10 L26 10 L22 24 L10 24 Z" fill="#38bdf8" stroke="#1e3a6a" stroke-width="2"/><path d="M10 10 Q16 2 22 10" stroke="#f59e0b" stroke-width="2.5" fill="none"/></svg>
+              </div>
               <strong>Fill Basket</strong>
-              <span>Match the shopping list</span>
+              <span>Match shopping list</span>
             </div>
             <div class="feature-card">
-              <span class="f-icon">💵</span>
+              <div class="feature-vector-icon">
+                <svg viewBox="0 0 32 32" class="feat-svg"><rect x="4" y="8" width="24" height="16" rx="3" fill="#10b981" stroke="#1e3a6a" stroke-width="2"/><circle cx="16" cy="16" r="4" fill="#fcd34d"/></svg>
+              </div>
               <strong>Pay Exact RM</strong>
-              <span>Use notes and coins</span>
+              <span>Notes &amp; sen coins</span>
             </div>
           </div>
 
@@ -367,50 +350,50 @@
         </div>
       </div>
 
-      <!-- HOW TO PLAY INSTRUCTIONS MODAL -->
+      <!-- ANIMATED HOW-TO-PLAY MODAL -->
       <div id="instructions-modal" class="overlay-screen hidden">
         <div class="overlay-card modal-card">
           <div class="modal-header">
-            <h2>HOW TO PLAY — SUPERMARKET SHOPPING</h2>
-            <button id="close-instructions-btn" class="close-btn" aria-label="Close instructions">✕</button>
+            <h2>HOW TO PLAY MATH SHOP</h2>
+            <button id="close-instructions-btn" class="close-btn" aria-label="Close instructions">X</button>
           </div>
 
           <div class="instructions-grid">
             <div class="instruction-box">
-              <div class="inst-icon">01</div>
+              <div class="inst-icon font-mono">01</div>
               <div class="inst-content">
                 <h3>Read the Shopping List</h3>
-                <p>Check the shopping task at the top (e.g. <em>"Buy 2 Apples and 1 Milk"</em>) to see which items and quantities to collect.</p>
+                <p>Check the shopping task at the top (e.g. <em>"Buy 2 Apples and 1 Milk"</em>) to see required items.</p>
               </div>
             </div>
 
             <div class="instruction-box">
-              <div class="inst-icon">02</div>
+              <div class="inst-icon font-mono">02</div>
               <div class="inst-content">
                 <h3>Pick Products From Shelves</h3>
-                <p>Click items on the supermarket shelves to place them into your shopping basket. Use <strong>+</strong> or <strong>-</strong> to adjust quantities.</p>
+                <p>Click items on the shelves to add to your basket. Use <strong>+</strong> or <strong>-</strong> to adjust quantities.</p>
               </div>
             </div>
 
             <div class="instruction-box">
-              <div class="inst-icon">03</div>
+              <div class="inst-icon font-mono">03</div>
               <div class="inst-content">
-                <h3>Check the Register Total (RM)</h3>
-                <p>The cash register calculates the total price in Malaysian Ringgit (RM) for all items in your basket.</p>
+                <h3>Check Register Total (RM)</h3>
+                <p>The register calculates the total price in Malaysian Ringgit (RM) for all items in your basket.</p>
               </div>
             </div>
 
             <div class="instruction-box">
-              <div class="inst-icon">04</div>
+              <div class="inst-icon font-mono">04</div>
               <div class="inst-content">
                 <h3>Pay with Banknotes &amp; Coins</h3>
-                <p>Click RM notes (RM50, RM20, RM10, RM5, RM1) and sen coins (50¢, 20¢, 10¢, 5¢) to match the total. Pay accurately to earn points and stars!</p>
+                <p>Click RM notes (RM50, RM20, RM10, RM5, RM1) and coins (50c, 20c, 10c, 5c) to match the total exactly!</p>
               </div>
             </div>
           </div>
 
           <button id="start-from-instructions-btn" class="arcade-btn btn-play modal-play-btn">
-            LET'S GO SHOPPING!
+            LET'S GO SHOPPING
           </button>
         </div>
       </div>
@@ -423,27 +406,33 @@
           <p id="end-subtitle" class="game-subtitle">You completed your shopping challenges with outstanding calculation accuracy!</p>
 
           <div class="stars-awarded" id="stars-container">
-            <span class="star-slot" data-star="1">★</span>
-            <span class="star-slot" data-star="2">★</span>
-            <span class="star-slot" data-star="3">★</span>
+            <div class="star-slot" data-star="1">
+              <svg viewBox="0 0 24 24" class="star-svg"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+            <div class="star-slot" data-star="2">
+              <svg viewBox="0 0 24 24" class="star-svg"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+            <div class="star-slot" data-star="3">
+              <svg viewBox="0 0 24 24" class="star-svg"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
           </div>
 
           <div class="score-summary-grid">
             <div class="summary-box">
               <span class="summary-label">FINAL SCORE</span>
-              <span id="final-score-val" class="summary-val highlight">0</span>
+              <span id="final-score-val" class="summary-val highlight font-mono">000000</span>
             </div>
             <div class="summary-box">
               <span class="summary-label">TASKS COMPLETED</span>
-              <span id="final-tasks-val" class="summary-val highlight-green">10 / 10</span>
+              <span id="final-tasks-val" class="summary-val highlight-green font-mono">10 / 10</span>
             </div>
             <div class="summary-box">
               <span class="summary-label">REMAINING LIVES</span>
-              <span id="final-lives-val" class="summary-val">3 / 3</span>
+              <span id="final-lives-val" class="summary-val font-mono">3 / 3</span>
             </div>
             <div class="summary-box">
               <span class="summary-label">TOTAL SPENT</span>
-              <span id="final-spent-val" class="summary-val">RM 0.00</span>
+              <span id="final-spent-val" class="summary-val font-mono">RM 0.00</span>
             </div>
           </div>
 

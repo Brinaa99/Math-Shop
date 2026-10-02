@@ -1,1029 +1,991 @@
 /**
- * MATH SHOP — RETRO ARCADE SUPERMARKET & CASHIER ENGINE
- * Standard 3 Mathematics: Money, Decimals, Pricing & Exact Payment in Malaysian Ringgit (RM)
- * Pure Vector Graphics — 100% Emoji Free
+ * MATH SHOP: DATA DASH — RETRO ARCADE SUPERMARKET DATA INTERPRETATION ENGINE
+ * Cambridge & Standard 3 Mathematics: Displaying & Interpreting Data
+ * (Pictographs, Bar Charts, Comparisons, Most/Least, Differences, Ordering)
+ * StuCent Sandboxed Runtime Compatible (Allow-Scripts / ShadowRoot Safe)
  */
 
 (() => {
   'use strict';
 
-  // ==========================================================================
-  // 1. SUPERMARKET WEBAUDIO SYNTHESIZER & BGM ENGINE
-  // ==========================================================================
-  class SupermarketAudio {
-    constructor() {
-      this.enabled = localStorage.getItem('math_games_sound') !== 'false';
-      this.ctx = null;
-      this.bgmGain = null;
-      this.bgmInterval = null;
-      this.bgmStep = 0;
+  const doc = typeof root !== 'undefined' ? root : document;
+  const gameCtx = typeof game !== 'undefined' ? game : (window.game || null);
+
+  const safeStorage = {
+    getItem(key) {
+      try { return (typeof window !== 'undefined' && window.localStorage) ? window.localStorage.getItem(key) : null; } catch (e) { return null; }
+    },
+    setItem(key, val) {
+      try { if (typeof window !== 'undefined' && window.localStorage) window.localStorage.setItem(key, val); } catch (e) {}
     }
-
-    init() {
-      if (!this.ctx) {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (AudioCtx) {
-          this.ctx = new AudioCtx();
-          this.bgmGain = this.ctx.createGain();
-          this.bgmGain.gain.setValueAtTime(this.enabled ? 0.04 : 0, this.ctx.currentTime);
-          this.bgmGain.connect(this.ctx.destination);
-        }
-      }
-      if (this.ctx && this.ctx.state === 'suspended') {
-        this.ctx.resume();
-      }
-    }
-
-    startBGM() {
-      this.init();
-      if (!this.ctx || this.bgmInterval) return;
-
-      // 116 BPM Supermarket Bossa / Arcade Shopping Groove in F Major
-      const bassline = [
-        174.61, 0, 220.00, 0,  261.63, 0, 220.00, 0,
-        146.83, 0, 220.00, 0,  261.63, 0, 220.00, 0,
-        164.81, 0, 196.00, 0,  246.94, 0, 196.00, 0,
-        130.81, 0, 196.00, 0,  261.63, 0, 0, 0
-      ];
-
-      const leadChords = [
-        349.23, 0, 440.00, 0,  523.25, 0, 440.00, 0,
-        293.66, 0, 440.00, 0,  523.25, 0, 440.00, 0,
-        329.63, 0, 392.00, 0,  493.88, 0, 392.00, 0,
-        261.63, 0, 392.00, 0,  523.25, 0, 0, 0
-      ];
-
-      const stepDuration = (60 / 116) / 4;
-      this.bgmStep = 0;
-
-      this.bgmInterval = setInterval(() => {
-        if (!this.enabled || !this.ctx) return;
-        const t = this.ctx.currentTime;
-        const idx = this.bgmStep % 32;
-
-        const bFreq = bassline[idx];
-        if (bFreq > 0) {
-          try {
-            const osc = this.ctx.createOscillator();
-            const gain = this.ctx.createGain();
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(bFreq, t);
-            gain.gain.setValueAtTime(0.045, t);
-            gain.gain.exponentialRampToValueAtTime(0.001, t + stepDuration * 1.5);
-            osc.connect(gain);
-            gain.connect(this.bgmGain);
-            osc.start(t);
-            osc.stop(t + stepDuration * 1.6);
-          } catch (e) {}
-        }
-
-        const lFreq = leadChords[idx];
-        if (lFreq > 0) {
-          try {
-            const osc = this.ctx.createOscillator();
-            const gain = this.ctx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(lFreq, t);
-            gain.gain.setValueAtTime(0.025, t);
-            gain.gain.exponentialRampToValueAtTime(0.001, t + stepDuration * 1.3);
-            osc.connect(gain);
-            gain.connect(this.bgmGain);
-            osc.start(t);
-            osc.stop(t + stepDuration * 1.4);
-          } catch (e) {}
-        }
-
-        this.bgmStep++;
-      }, stepDuration * 1000);
-    }
-
-    stopBGM() {
-      if (this.bgmInterval) {
-        clearInterval(this.bgmInterval);
-        this.bgmInterval = null;
-      }
-    }
-
-    playTone(freq, type, duration, gainVal = 0.1, startTime = null) {
-      if (!this.enabled) return;
-      this.init();
-      if (!this.ctx) return;
-      try {
-        const now = startTime || this.ctx.currentTime;
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, now);
-        gain.gain.setValueAtTime(gainVal, now);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start(now);
-        osc.stop(now + duration);
-      } catch (e) {}
-    }
-
-    playLaserScan() {
-      this.playTone(1760.0, 'sine', 0.08, 0.15); // optical beep
-    }
-
-    playCoinClink() {
-      const now = this.ctx ? this.ctx.currentTime : null;
-      this.playTone(1200, 'sine', 0.09, 0.12, now);
-      if (now) this.playTone(1600, 'triangle', 0.12, 0.08, now + 0.02);
-    }
-
-    playBillSnap() {
-      this.playTone(450, 'triangle', 0.07, 0.14);
-      setTimeout(() => this.playTone(600, 'sine', 0.06, 0.1), 30);
-    }
-
-    playKaChing() {
-      this.playTone(1318.51, 'sine', 0.22, 0.15);
-      setTimeout(() => this.playTone(1760.00, 'sine', 0.35, 0.18), 70);
-    }
-
-    playSuccessFanfare() {
-      const notes = [523.25, 659.25, 783.99, 1046.50];
-      notes.forEach((freq, i) => {
-        setTimeout(() => this.playTone(freq, 'sine', 0.15, 0.12), i * 75);
-      });
-    }
-
-    playWrongBuzz() {
-      this.playTone(160, 'sawtooth', 0.25, 0.18);
-    }
-
-    playClick() {
-      this.playTone(800, 'sine', 0.04, 0.08);
-    }
-  }
-
-  // ==========================================================================
-  // 2. VECTOR SVG CATALOG (100% EMOJI FREE)
-  // ==========================================================================
-  const SVG_ICONS = {
-    apple: `<svg viewBox="0 0 32 32" class="prod-svg"><circle cx="16" cy="18" r="11" fill="#ef4444"/><path d="M16 7 Q18 3 22 4" stroke="#15803d" stroke-width="2.5" fill="none" stroke-linecap="round"/><ellipse cx="14" cy="14" rx="2" ry="4" fill="#fca5a5" transform="rotate(-20 14 14)"/></svg>`,
-    banana: `<svg viewBox="0 0 32 32" class="prod-svg"><path d="M7 24 Q16 28 25 15 Q22 23 9 20 Z" fill="#fcd34d" stroke="#d97706" stroke-width="1.5"/><path d="M5 23 Q16 26 23 10" stroke="#b45309" stroke-width="1.5" fill="none"/></svg>`,
-    carrot: `<svg viewBox="0 0 32 32" class="prod-svg"><polygon points="7 7, 26 12, 14 28" fill="#f97316" stroke="#c2410c" stroke-width="1.5"/><path d="M6 7 Q4 2 8 3 M6 7 Q1 5 3 9" stroke="#16a34a" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`,
-    broccoli: `<svg viewBox="0 0 32 32" class="prod-svg"><rect x="13" y="16" width="6" height="12" rx="3" fill="#86efac" stroke="#15803d" stroke-width="1.5"/><circle cx="12" cy="12" r="7" fill="#22c55e"/><circle cx="20" cy="12" r="7" fill="#16a34a"/><circle cx="16" cy="8" r="6" fill="#15803d"/></svg>`,
-    orange: `<svg viewBox="0 0 32 32" class="prod-svg"><circle cx="16" cy="17" r="11" fill="#f97316" stroke="#c2410c" stroke-width="1.5"/><path d="M16 6 Q20 3 22 7" stroke="#15803d" stroke-width="2" fill="none" stroke-linecap="round"/><ellipse cx="16" cy="17" rx="9" ry="9" fill="none" stroke="#ea580c" stroke-dasharray="2 3"/></svg>`,
-    strawberry: `<svg viewBox="0 0 32 32" class="prod-svg"><path d="M8 12 C8 6, 24 6, 24 12 C24 22, 16 28, 16 28 C16 28, 8 22, 8 12 Z" fill="#dc2626" stroke="#991b1b" stroke-width="1.5"/><circle cx="12" cy="14" r="1" fill="#fef08a"/><circle cx="20" cy="14" r="1" fill="#fef08a"/><circle cx="16" cy="18" r="1" fill="#fef08a"/><circle cx="14" cy="22" r="1" fill="#fef08a"/><circle cx="18" cy="22" r="1" fill="#fef08a"/><path d="M12 7 Q16 10 20 7" stroke="#15803d" stroke-width="2" fill="none"/></svg>`,
-    bread: `<svg viewBox="0 0 32 32" class="prod-svg"><rect x="6" y="12" width="20" height="14" rx="4" fill="#d97706" stroke="#78350f" stroke-width="1.5"/><ellipse cx="16" cy="12" rx="10" ry="5" fill="#fcd34d" stroke="#78350f" stroke-width="1.5"/><line x1="11" y1="12" x2="11" y2="24" stroke="#78350f" stroke-width="1"/><line x1="16" y1="12" x2="16" y2="24" stroke="#78350f" stroke-width="1"/><line x1="21" y1="12" x2="21" y2="24" stroke="#78350f" stroke-width="1"/></svg>`,
-    milk: `<svg viewBox="0 0 32 32" class="prod-svg"><rect x="10" y="10" width="12" height="18" rx="2" fill="#f8fafc" stroke="#334155" stroke-width="1.5"/><polygon points="10 10, 16 5, 22 10" fill="#3b82f6" stroke="#334155" stroke-width="1.5"/><rect x="10" y="16" width="12" height="6" fill="#38bdf8"/></svg>`,
-    cheese: `<svg viewBox="0 0 32 32" class="prod-svg"><polygon points="6 22, 26 22, 26 12, 6 18" fill="#facc15" stroke="#ca8a04" stroke-width="1.5"/><circle cx="12" cy="19" r="2" fill="#ca8a04"/><circle cx="20" cy="17" r="1.5" fill="#ca8a04"/><circle cx="17" cy="20" r="1.2" fill="#ca8a04"/></svg>`,
-    eggs: `<svg viewBox="0 0 32 32" class="prod-svg"><ellipse cx="12" cy="18" rx="6" ry="8" fill="#fde68a" stroke="#d97706" stroke-width="1.5" transform="rotate(-15 12 18)"/><ellipse cx="20" cy="18" rx="6" ry="8" fill="#fed7aa" stroke="#ea580c" stroke-width="1.5" transform="rotate(15 20 18)"/></svg>`,
-    croissant: `<svg viewBox="0 0 32 32" class="prod-svg"><path d="M5 21 C8 12, 24 12, 27 21 C22 16, 10 16, 5 21 Z" fill="#d97706" stroke="#78350f" stroke-width="1.5"/><ellipse cx="16" cy="16" rx="6" ry="4" fill="#fcd34d"/></svg>`,
-    juice: `<svg viewBox="0 0 32 32" class="prod-svg"><rect x="10" y="10" width="12" height="18" rx="2" fill="#f97316" stroke="#c2410c" stroke-width="1.5"/><path d="M18 10 L22 4" stroke="#fcd34d" stroke-width="2" stroke-linecap="round"/><circle cx="16" cy="19" r="3.5" fill="#fef08a"/></svg>`,
-    cereal: `<svg viewBox="0 0 32 32" class="prod-svg"><path d="M6 15 Q16 12 26 15 L23 25 Q16 28 9 25 Z" fill="#38bdf8" stroke="#0284c7" stroke-width="1.5"/><ellipse cx="16" cy="15" rx="10" ry="3" fill="#fef08a"/><path d="M22 10 L27 7" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"/></svg>`,
-    cookies: `<svg viewBox="0 0 32 32" class="prod-svg"><circle cx="16" cy="16" r="11" fill="#d97706" stroke="#78350f" stroke-width="1.5"/><circle cx="12" cy="12" r="1.8" fill="#451a03"/><circle cx="20" cy="13" r="1.8" fill="#451a03"/><circle cx="15" cy="19" r="1.8" fill="#451a03"/><circle cx="20" cy="20" r="1.8" fill="#451a03"/><circle cx="10" cy="18" r="1.5" fill="#451a03"/></svg>`,
-    choc: `<svg viewBox="0 0 32 32" class="prod-svg"><rect x="8" y="8" width="16" height="20" rx="2" fill="#78350f" stroke="#451a03" stroke-width="1.5"/><rect x="8" y="16" width="16" height="12" rx="1" fill="#dc2626" stroke="#991b1b" stroke-width="1"/><line x1="16" y1="8" x2="16" y2="16" stroke="#451a03" stroke-width="1.5"/></svg>`,
-    chips: `<svg viewBox="0 0 32 32" class="prod-svg"><polygon points="8 6, 24 6, 22 26, 10 26" fill="#3b82f6" stroke="#1d4ed8" stroke-width="1.5"/><ellipse cx="16" cy="16" rx="4" ry="2.5" fill="#facc15" stroke="#ca8a04" stroke-width="1"/></svg>`,
-    honey: `<svg viewBox="0 0 32 32" class="prod-svg"><rect x="9" y="11" width="14" height="16" rx="4" fill="#f59e0b" stroke="#b45309" stroke-width="1.5"/><rect x="11" y="7" width="10" height="4" rx="1" fill="#fcd34d" stroke="#b45309" stroke-width="1"/><rect x="11" y="15" width="10" height="6" rx="1" fill="#fef08a"/></svg>`
   };
 
-  const PRODUCTS = [
-    // Produce
-    { id: 'apple', name: 'Fresh Apple', price: 2.00, category: 'produce' },
-    { id: 'banana', name: 'Banana Bunch', price: 1.50, category: 'produce' },
-    { id: 'carrot', name: 'Fresh Carrot', price: 1.00, category: 'produce' },
-    { id: 'broccoli', name: 'Green Broccoli', price: 2.50, category: 'produce' },
-    { id: 'orange', name: 'Sweet Orange', price: 1.80, category: 'produce' },
-    { id: 'strawberry', name: 'Strawberries', price: 3.00, category: 'produce' },
+  function getEl(id) {
+    try {
+      if (doc && typeof doc.getElementById === 'function') {
+        const el = doc.getElementById(id);
+        if (el) return el;
+      }
+      if (doc && typeof doc.querySelector === 'function') {
+        const el = doc.querySelector('#' + id);
+        if (el) return el;
+      }
+    } catch (e) {}
+    try {
+      if (typeof document !== 'undefined' && typeof document.getElementById === 'function') {
+        return document.getElementById(id);
+      }
+    } catch (e) {}
+    return null;
+  }
 
-    // Bakery & Dairy
-    { id: 'bread', name: 'Sliced Bread', price: 3.00, category: 'bakery' },
-    { id: 'milk', name: 'Fresh Milk', price: 2.50, category: 'bakery' },
-    { id: 'cheese', name: 'Cheddar Cheese', price: 4.00, category: 'bakery' },
-    { id: 'eggs', name: 'Farm Eggs', price: 1.20, category: 'bakery' },
-    { id: 'croissant', name: 'Butter Croissant', price: 2.20, category: 'bakery' },
-
-    // Snacks & Drinks
-    { id: 'juice', name: 'Orange Juice Box', price: 3.50, category: 'snacks' },
-    { id: 'cereal', name: 'Breakfast Cereal', price: 4.50, category: 'snacks' },
-    { id: 'cookies', name: 'Choc Cookies', price: 2.00, category: 'snacks' },
-    { id: 'choc', name: 'Chocolate Bar', price: 1.50, category: 'snacks' },
-    { id: 'chips', name: 'Potato Chips', price: 2.80, category: 'snacks' },
-    { id: 'honey', name: 'Pure Honey Jar', price: 5.00, category: 'snacks' }
-  ];
+  function queryAll(sel) {
+    try {
+      if (doc && typeof doc.querySelectorAll === 'function') {
+        const res = doc.querySelectorAll(sel);
+        if (res && res.length > 0) return res;
+      }
+    } catch (e) {}
+    try {
+      if (typeof document !== 'undefined' && typeof document.querySelectorAll === 'function') {
+        return document.querySelectorAll(sel);
+      }
+    } catch (e) {}
+    return [];
+  }
 
   // ==========================================================================
-  // 3. 10 REALISTIC SHOPPING TASKS (MALAYSIAN RINGGIT)
+  // 1. SOUND SYNTHESIZER & PROCEDURAL SUPERMARKET BGM
   // ==========================================================================
-  const CHALLENGES = [
-    {
-      id: 1,
-      title: 'Buy 2 Fresh Apples',
-      items: [{ id: 'apple', qty: 2 }],
-      targetTotal: 4.00,
-      hint: '2 Apples @ RM 2.00 = RM 4.00. Try paying with 4x RM1 notes!'
-    },
-    {
-      id: 2,
-      title: 'Buy 1 Sliced Bread and 1 Fresh Milk',
-      items: [
-        { id: 'bread', qty: 1 },
-        { id: 'milk', qty: 1 }
-      ],
-      targetTotal: 5.50,
-      hint: 'RM 3.00 + RM 2.50 = RM 5.50. Try paying with 1x RM5 note and 1x 50 sen coin!'
-    },
-    {
-      id: 3,
-      title: 'Buy 2 Banana Bunches and 1 Orange Juice Box',
-      items: [
-        { id: 'banana', qty: 2 },
-        { id: 'juice', qty: 1 }
-      ],
-      targetTotal: 6.50,
-      hint: '(2 x RM 1.50 = RM 3.00) + RM 3.50 = RM 6.50. Try 1x RM5, 1x RM1, and 1x 50 sen!'
-    },
-    {
-      id: 4,
-      title: 'Buy 1 Breakfast Cereal and 2 Farm Eggs',
-      items: [
-        { id: 'cereal', qty: 1 },
-        { id: 'eggs', qty: 2 }
-      ],
-      targetTotal: 6.90,
-      hint: 'RM 4.50 + (2 x RM 1.20 = RM 2.40) = RM 6.90. Try RM5 + RM1 + 50 sen + 2x 20 sen!'
-    },
-    {
-      id: 5,
-      title: 'Buy 3 Fresh Carrots and 2 Choc Cookies',
-      items: [
-        { id: 'carrot', qty: 3 },
-        { id: 'cookies', qty: 2 }
-      ],
-      targetTotal: 7.00,
-      hint: '(3 x RM 1.00) + (2 x RM 2.00) = RM 7.00. Try 1x RM5 and 2x RM1 notes!'
-    },
-    {
-      id: 6,
-      title: 'Buy 1 Cheddar Cheese and 2 Strawberries',
-      items: [
-        { id: 'cheese', qty: 1 },
-        { id: 'strawberry', qty: 2 }
-      ],
-      targetTotal: 10.00,
-      hint: 'RM 4.00 + (2 x RM 3.00 = RM 6.00) = RM 10.00. Try 1x RM10 note or 2x RM5 notes!'
-    },
-    {
-      id: 7,
-      title: 'Buy 2 Butter Croissants and 1 Fresh Milk',
-      items: [
-        { id: 'croissant', qty: 2 },
-        { id: 'milk', qty: 1 }
-      ],
-      targetTotal: 6.90,
-      hint: '(2 x RM 2.20 = RM 4.40) + RM 2.50 = RM 6.90. Try RM5 + RM1 + 50 sen + 2x 20 sen!'
-    },
-    {
-      id: 8,
-      title: 'Buy 1 Honey Jar, 1 Potato Chips, and 1 Banana Bunch',
-      items: [
-        { id: 'honey', qty: 1 },
-        { id: 'chips', qty: 1 },
-        { id: 'banana', qty: 1 }
-      ],
-      targetTotal: 9.30,
-      hint: 'RM 5.00 + RM 2.80 + RM 1.50 = RM 9.30. Try RM5 + 4x RM1 + 20 sen + 10 sen!'
-    },
-    {
-      id: 9,
-      title: 'Buy 2 Green Broccoli, 1 Cereal, and 2 Orange Juices',
-      items: [
-        { id: 'broccoli', qty: 2 },
-        { id: 'cereal', qty: 1 },
-        { id: 'juice', qty: 2 }
-      ],
-      targetTotal: 16.50,
-      hint: 'RM 5.00 + RM 4.50 + RM 7.00 = RM 16.50. Try 1x RM10 + 1x RM5 + 1x RM1 + 50 sen!'
-    },
-    {
-      id: 10,
-      title: 'Mega Feast: 2 Cheese, 2 Cookies, 1 Honey Jar, and 3 Apples',
-      items: [
-        { id: 'cheese', qty: 2 },
-        { id: 'cookies', qty: 2 },
-        { id: 'honey', qty: 1 },
-        { id: 'apple', qty: 3 }
-      ],
-      targetTotal: 23.00,
-      hint: 'RM 8.00 + RM 4.00 + RM 5.00 + RM 6.00 = RM 23.00. Try 1x RM20 + 3x RM1 notes!'
-    }
-  ];
+  let audioCtx = null;
+  let isMuted = safeStorage.getItem('math_games_sound') === 'false';
+  let bgmMasterGain = null;
+  let bgmInterval = null;
+  let bgmStep = 0;
 
-  // ==========================================================================
-  // 4. MAIN GAME STATE CONTROLLER
-  // ==========================================================================
-  class MathShopGame {
-    constructor() {
-      this.audio = new SupermarketAudio();
-
-      this.score = 0;
-      this.lives = 3;
-      this.maxLives = 3;
-      this.currentTaskIdx = 0;
-      this.timeLeft = 90;
-      this.timerInterval = null;
-      this.isPlaying = false;
-      this.startTime = 0;
-      this.totalSpent = 0;
-      this.gameEnded = false;
-
-      // Basket & Payment State
-      this.basket = {};
-      this.paymentTray = [];
-      this.selectedCategory = 'all';
-
-      // DOM Cache
-      this.dom = {
-        scoreDisplay: document.getElementById('score-display'),
-        livesContainer: document.getElementById('lives-container'),
-        timerDisplay: document.getElementById('timer-display'),
-        progressDisplay: document.getElementById('progress-display'),
-
-        taskTitleText: document.getElementById('task-title-text'),
-        taskChecklist: document.getElementById('task-checklist'),
-        taskHintBox: document.getElementById('task-hint-box'),
-        taskHintText: document.getElementById('task-hint-text'),
-
-        shelvesGrid: document.getElementById('shelves-grid'),
-        catTabs: document.querySelectorAll('.cat-tab'),
-
-        basketItemCount: document.getElementById('basket-item-count'),
-        basketItemsList: document.getElementById('basket-items-list'),
-        basketTotalText: document.getElementById('basket-total-text'),
-
-        cashierAvatar: document.getElementById('cashier-avatar'),
-        cashierSpeech: document.getElementById('cashier-speech'),
-
-        posStatusBadge: document.getElementById('pos-status-badge'),
-        posTotalDue: document.getElementById('pos-total-due'),
-        posPaidAmount: document.getElementById('pos-paid-amount'),
-        posDifferenceTag: document.getElementById('pos-difference-tag'),
-
-        traySumDisplay: document.getElementById('tray-sum-display'),
-        paymentMatItems: document.getElementById('payment-mat-items'),
-        btnUndoMoney: document.getElementById('btn-undo-money'),
-        btnClearMoney: document.getElementById('btn-clear-money'),
-        btnPayCheckout: document.getElementById('btn-pay-checkout'),
-
-        checkoutSuccessModal: document.getElementById('checkout-success-modal'),
-        receiptTaskName: document.getElementById('receipt-task-name'),
-        receiptTotalAmount: document.getElementById('receipt-total-amount'),
-        receiptPaidAmount: document.getElementById('receipt-paid-amount'),
-        successPoints: document.getElementById('success-points'),
-        btnNextTask: document.getElementById('btn-next-task'),
-
-        startScreen: document.getElementById('start-screen'),
-        startGameBtn: document.getElementById('start-game-btn'),
-        howToPlayBtn: document.getElementById('start-how-to-play-btn'),
-        hudHowToPlayBtn: document.getElementById('hud-how-to-play-btn'),
-        hudRestartBtn: document.getElementById('hud-restart-btn'),
-        instructionsModal: document.getElementById('instructions-modal'),
-        closeInstructionsBtn: document.getElementById('close-instructions-btn'),
-        startFromInstructionsBtn: document.getElementById('start-from-instructions-btn'),
-
-        endScreen: document.getElementById('end-screen'),
-        endTitle: document.getElementById('end-title'),
-        endSubtitle: document.getElementById('end-subtitle'),
-        starsContainer: document.getElementById('stars-container'),
-        finalScoreVal: document.getElementById('final-score-val'),
-        finalTasksVal: document.getElementById('final-tasks-val'),
-        finalLivesVal: document.getElementById('final-lives-val'),
-        finalSpentVal: document.getElementById('final-spent-val'),
-        playAgainBtn: document.getElementById('play-again-btn'),
-
-        soundToggleBtn: document.getElementById('sound-toggle-btn'),
-        particlesLayer: document.getElementById('flying-particles-layer')
-      };
-
-      this.initEvents();
-      this.renderShelves();
-    }
-
-    initEvents() {
-      if (this.dom.startGameBtn) {
-        this.dom.startGameBtn.addEventListener('click', () => {
-          this.audio.init();
-          this.audio.playClick();
-          this.startGame();
-        });
-      }
-
-      if (this.dom.howToPlayBtn) {
-        this.dom.howToPlayBtn.addEventListener('click', () => this.showInstructions());
-      }
-      if (this.dom.hudHowToPlayBtn) {
-        this.dom.hudHowToPlayBtn.addEventListener('click', () => this.showInstructions());
-      }
-      if (this.dom.closeInstructionsBtn) {
-        this.dom.closeInstructionsBtn.addEventListener('click', () => this.hideInstructions());
-      }
-      if (this.dom.startFromInstructionsBtn) {
-        this.dom.startFromInstructionsBtn.addEventListener('click', () => {
-          this.hideInstructions();
-          this.startGame();
-        });
-      }
-
-      if (this.dom.hudRestartBtn) {
-        this.dom.hudRestartBtn.addEventListener('click', () => {
-          this.audio.playClick();
-          this.startGame();
-        });
-      }
-
-      if (this.dom.soundToggleBtn) {
-        this.dom.soundToggleBtn.textContent = this.audio.enabled ? 'SOUND ON' : 'SOUND OFF';
-        this.dom.soundToggleBtn.addEventListener('click', () => {
-          this.audio.enabled = !this.audio.enabled;
-          localStorage.setItem('math_games_sound', this.audio.enabled ? 'true' : 'false');
-          if (this.audio.bgmGain && this.audio.ctx) {
-            this.audio.bgmGain.gain.setValueAtTime(this.audio.enabled ? 0.04 : 0, this.audio.ctx.currentTime);
-          }
-          if (this.audio.enabled && this.isPlaying) {
-            this.audio.startBGM();
-          } else if (!this.audio.enabled) {
-            this.audio.stopBGM();
-          }
-          this.dom.soundToggleBtn.textContent = this.audio.enabled ? 'SOUND ON' : 'SOUND OFF';
-        });
-      }
-
-      if (this.dom.playAgainBtn) {
-        this.dom.playAgainBtn.addEventListener('click', () => this.startGame());
-      }
-
-      if (this.dom.btnNextTask) {
-        this.dom.btnNextTask.addEventListener('click', () => this.proceedToNextTask());
-      }
-
-      if (this.dom.catTabs) {
-        this.dom.catTabs.forEach(tab => {
-          tab.addEventListener('click', () => {
-            this.audio.playClick();
-            this.dom.catTabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            this.selectedCategory = tab.dataset.cat;
-            this.renderShelves();
-          });
-        });
-      }
-
-      document.querySelectorAll('.money-token').forEach(tokenBtn => {
-        tokenBtn.addEventListener('click', () => {
-          const val = parseFloat(tokenBtn.dataset.value);
-          this.addMoneyToTray(val);
-        });
-      });
-
-      if (this.dom.btnUndoMoney) {
-        this.dom.btnUndoMoney.addEventListener('click', () => this.undoLastMoney());
-      }
-      if (this.dom.btnClearMoney) {
-        this.dom.btnClearMoney.addEventListener('click', () => this.clearMoneyTray());
-      }
-      if (this.dom.btnPayCheckout) {
-        this.dom.btnPayCheckout.addEventListener('click', () => this.validateAndCheckout());
+  function initAudio() {
+    if (!audioCtx) {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioContextClass) {
+        audioCtx = new AudioContextClass();
+        bgmMasterGain = audioCtx.createGain();
+        bgmMasterGain.gain.setValueAtTime(isMuted ? 0 : 0.05, audioCtx.currentTime);
+        bgmMasterGain.connect(audioCtx.destination);
       }
     }
-
-    setCashierSpeech(text) {
-      if (this.dom.cashierSpeech) this.dom.cashierSpeech.textContent = text;
-    }
-
-    showInstructions() {
-      this.audio.playClick();
-      if (this.dom.instructionsModal) this.dom.instructionsModal.classList.remove('hidden');
-    }
-
-    hideInstructions() {
-      this.audio.playClick();
-      if (this.dom.instructionsModal) this.dom.instructionsModal.classList.add('hidden');
-    }
-
-    startGame() {
-      if (this.dom.startScreen) this.dom.startScreen.classList.add('hidden');
-      if (this.dom.endScreen) this.dom.endScreen.classList.add('hidden');
-      if (this.dom.checkoutSuccessModal) this.dom.checkoutSuccessModal.classList.add('hidden');
-
-      this.score = 0;
-      this.lives = this.maxLives;
-      this.currentTaskIdx = 0;
-      this.timeLeft = 90;
-      this.totalSpent = 0;
-      this.isPlaying = true;
-      this.gameEnded = false;
-      this.startTime = Date.now();
-
-      this.audio.startBGM();
-      this.updateHUD();
-      this.loadTask(this.currentTaskIdx);
-      this.startTimer();
-    }
-
-    startTimer() {
-      if (this.timerInterval) clearInterval(this.timerInterval);
-      this.timerInterval = setInterval(() => {
-        if (!this.isPlaying) return;
-        this.timeLeft--;
-        if (this.dom.timerDisplay) {
-          this.dom.timerDisplay.textContent = String(this.timeLeft).padStart(3, '0');
-          if (this.timeLeft <= 10) {
-            this.dom.timerDisplay.style.color = '#ef4444';
-          } else {
-            this.dom.timerDisplay.style.color = '';
-          }
-        }
-
-        if (this.timeLeft <= 0) {
-          clearInterval(this.timerInterval);
-          this.endGame(false, 'Time ran out! Your supermarket shift has ended.');
-        }
-      }, 1000);
-    }
-
-    updateHUD() {
-      if (this.dom.scoreDisplay) this.dom.scoreDisplay.textContent = String(this.score).padStart(6, '0');
-      if (this.dom.timerDisplay) this.dom.timerDisplay.textContent = String(this.timeLeft).padStart(3, '0');
-      if (this.dom.progressDisplay) {
-        const cur = String(this.currentTaskIdx + 1).padStart(2, '0');
-        const total = String(CHALLENGES.length).padStart(2, '0');
-        this.dom.progressDisplay.textContent = `${cur} / ${total}`;
-      }
-
-      if (this.dom.livesContainer) {
-        const hearts = this.dom.livesContainer.querySelectorAll('.heart-icon');
-        hearts.forEach((heart, idx) => {
-          if (idx < this.lives) {
-            heart.classList.remove('lost');
-            heart.classList.add('active');
-          } else {
-            heart.classList.add('lost');
-            heart.classList.remove('active');
-          }
-        });
-      }
-    }
-
-    triggerShake() {
-      const el = document.getElementById('game-app') || document.body;
-      if (!el) return;
-      el.style.transform = 'translate(6px, -4px)';
-      setTimeout(() => { el.style.transform = 'translate(-6px, 4px)'; }, 50);
-      setTimeout(() => { el.style.transform = 'translate(4px, -3px)'; }, 100);
-      setTimeout(() => { el.style.transform = 'translate(-4px, 2px)'; }, 150);
-      setTimeout(() => { el.style.transform = 'none'; }, 200);
-    }
-
-    loadTask(taskIndex) {
-      if (taskIndex >= CHALLENGES.length) {
-        this.endGame(true, 'Supermarket Champion! All 10 challenges completed!');
-        return;
-      }
-
-      const task = CHALLENGES[taskIndex];
-      this.basket = {};
-      this.paymentTray = [];
-      this.hideHint();
-
-      if (this.dom.taskTitleText) {
-        this.dom.taskTitleText.textContent = `Task ${task.id}: ${task.title}`;
-      }
-      this.setCashierSpeech(`"Task ${task.id}: Find the items on your list, then pay RM ${task.targetTotal.toFixed(2)} at the checkout!"`);
-      this.renderTaskChecklist();
-      this.renderShelves();
-      this.renderBasket();
-      this.updatePaymentDisplay();
-      this.updateHUD();
-    }
-
-    renderTaskChecklist() {
-      const task = CHALLENGES[this.currentTaskIdx];
-      if (!this.dom.taskChecklist) return;
-      this.dom.taskChecklist.innerHTML = '';
-
-      let allCollected = true;
-
-      task.items.forEach(reqItem => {
-        const prod = PRODUCTS.find(p => p.id === reqItem.id);
-        const inBasket = this.basket[reqItem.id] || 0;
-        const isComplete = inBasket === reqItem.qty;
-        if (!isComplete) allCollected = false;
-
-        const pill = document.createElement('div');
-        pill.className = `task-check-pill ${isComplete ? 'completed' : ''}`;
-        pill.innerHTML = `
-          <span>${prod.name}</span>
-          <span class="pill-qty">(${inBasket}/${reqItem.qty})</span>
-          ${isComplete ? '<span>[DONE]</span>' : ''}
-        `;
-        this.dom.taskChecklist.appendChild(pill);
-      });
-
-      if (allCollected) {
-        this.setCashierSpeech(`"All items collected! Now place exactly RM ${task.targetTotal.toFixed(2)} into the payment tray!"`);
-      }
-    }
-
-    showHint(message) {
-      if (this.dom.taskHintText) this.dom.taskHintText.textContent = message;
-      if (this.dom.taskHintBox) this.dom.taskHintBox.classList.remove('hidden');
-    }
-
-    hideHint() {
-      if (this.dom.taskHintBox) this.dom.taskHintBox.classList.add('hidden');
-    }
-
-    renderShelves() {
-      if (!this.dom.shelvesGrid) return;
-      this.dom.shelvesGrid.innerHTML = '';
-
-      const filtered = PRODUCTS.filter(p => {
-        if (this.selectedCategory === 'all') return true;
-        return p.category === this.selectedCategory;
-      });
-
-      filtered.forEach(prod => {
-        const qtyInBasket = this.basket[prod.id] || 0;
-        const card = document.createElement('div');
-        card.className = `product-card ${qtyInBasket > 0 ? 'in-basket' : ''}`;
-
-        card.innerHTML = `
-          <div class="product-vector-wrap">${SVG_ICONS[prod.id] || ''}</div>
-          <div class="product-name">${prod.name}</div>
-          <div class="product-price-tag">RM ${prod.price.toFixed(2)}</div>
-          <div class="product-actions">
-            ${qtyInBasket > 0 ? `<button class="btn-shelf-mod btn-minus" data-action="minus" data-id="${prod.id}">-</button>` : ''}
-            <span class="product-qty-badge">${qtyInBasket > 0 ? `x${qtyInBasket}` : ''}</span>
-            <button class="btn-shelf-mod btn-plus" data-action="plus" data-id="${prod.id}">+</button>
-          </div>
-        `;
-
-        card.addEventListener('click', (e) => {
-          if (e.target.closest('.btn-shelf-mod')) return;
-          this.modifyBasketItem(prod.id, 1, card);
-        });
-
-        const plusBtn = card.querySelector('.btn-plus');
-        if (plusBtn) {
-          plusBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.modifyBasketItem(prod.id, 1, card);
-          });
-        }
-
-        const minusBtn = card.querySelector('.btn-minus');
-        if (minusBtn) {
-          minusBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.modifyBasketItem(prod.id, -1, card);
-          });
-        }
-
-        this.dom.shelvesGrid.appendChild(card);
-      });
-    }
-
-    modifyBasketItem(productId, delta, cardEl = null) {
-      const current = this.basket[productId] || 0;
-      const next = current + delta;
-
-      if (next <= 0) {
-        delete this.basket[productId];
-      } else {
-        this.basket[productId] = next;
-      }
-
-      if (delta > 0) {
-        this.audio.playLaserScan();
-      } else {
-        this.audio.playClick();
-      }
-
-      this.renderShelves();
-      this.renderBasket();
-      this.renderTaskChecklist();
-      this.updatePaymentDisplay();
-    }
-
-    renderBasket() {
-      if (!this.dom.basketItemsList) return;
-      this.dom.basketItemsList.innerHTML = '';
-      const itemKeys = Object.keys(this.basket);
-
-      let totalItems = 0;
-      let totalRM = 0;
-
-      if (itemKeys.length === 0) {
-        this.dom.basketItemsList.innerHTML = `
-          <div class="basket-empty-state">
-            <span>Select grocery items on shelves to place them into your basket</span>
-          </div>
-        `;
-        if (this.dom.basketItemCount) this.dom.basketItemCount.textContent = '0 items';
-        if (this.dom.basketTotalText) this.dom.basketTotalText.textContent = 'RM 0.00';
-        return;
-      }
-
-      itemKeys.forEach(pId => {
-        const prod = PRODUCTS.find(p => p.id === pId);
-        const qty = this.basket[pId];
-        const lineTotal = prod.price * qty;
-
-        totalItems += qty;
-        totalRM += lineTotal;
-
-        const row = document.createElement('div');
-        row.className = 'basket-row-item';
-        row.innerHTML = `
-          <div class="basket-row-info">
-            <span class="basket-row-name">${prod.name}</span>
-            <span class="basket-row-qty">x${qty}</span>
-          </div>
-          <div class="basket-row-actions">
-            <strong class="basket-row-price font-mono">RM ${lineTotal.toFixed(2)}</strong>
-            <button class="btn-remove-basket-item" data-id="${prod.id}" title="Remove item">X</button>
-          </div>
-        `;
-
-        row.querySelector('.btn-remove-basket-item').addEventListener('click', () => {
-          delete this.basket[prod.id];
-          this.audio.playClick();
-          this.renderShelves();
-          this.renderBasket();
-          this.renderTaskChecklist();
-          this.updatePaymentDisplay();
-        });
-
-        this.dom.basketItemsList.appendChild(row);
-      });
-
-      if (this.dom.basketItemCount) {
-        this.dom.basketItemCount.textContent = `${totalItems} item${totalItems > 1 ? 's' : ''}`;
-      }
-      if (this.dom.basketTotalText) {
-        this.dom.basketTotalText.textContent = `RM ${totalRM.toFixed(2)}`;
-      }
-    }
-
-    addMoneyToTray(value) {
-      if (!this.isPlaying) return;
-
-      this.paymentTray.push(value);
-
-      if (value >= 1.00) {
-        this.audio.playBillSnap();
-      } else {
-        this.audio.playCoinClink();
-      }
-
-      this.updatePaymentDisplay();
-    }
-
-    undoLastMoney() {
-      if (this.paymentTray.length === 0) return;
-      this.paymentTray.pop();
-      this.audio.playClick();
-      this.updatePaymentDisplay();
-    }
-
-    clearMoneyTray() {
-      if (this.paymentTray.length === 0) return;
-      this.paymentTray = [];
-      this.audio.playClick();
-      this.updatePaymentDisplay();
-    }
-
-    getTrayTotal() {
-      let sum = this.paymentTray.reduce((acc, v) => acc + v, 0);
-      return Math.round(sum * 100) / 100;
-    }
-
-    updatePaymentDisplay() {
-      const task = CHALLENGES[this.currentTaskIdx];
-      if (!task) return;
-      const trayTotal = this.getTrayTotal();
-
-      if (this.dom.posTotalDue) this.dom.posTotalDue.textContent = `RM ${task.targetTotal.toFixed(2)}`;
-      if (this.dom.posPaidAmount) this.dom.posPaidAmount.textContent = `RM ${trayTotal.toFixed(2)}`;
-      if (this.dom.traySumDisplay) this.dom.traySumDisplay.textContent = `RM ${trayTotal.toFixed(2)}`;
-
-      const diff = Math.round((task.targetTotal - trayTotal) * 100) / 100;
-      if (this.dom.posDifferenceTag && this.dom.posStatusBadge) {
-        if (diff > 0) {
-          this.dom.posDifferenceTag.innerHTML = `Needs: <strong style="color: #ef4444;" class="font-mono">RM ${diff.toFixed(2)}</strong>`;
-          this.dom.posStatusBadge.textContent = 'READY TO PAY';
-          this.dom.posStatusBadge.style.color = '#38bdf8';
-        } else if (diff < 0) {
-          this.dom.posDifferenceTag.innerHTML = `Over by: <strong style="color: #f59e0b;" class="font-mono">RM ${Math.abs(diff).toFixed(2)}</strong>`;
-          this.dom.posStatusBadge.textContent = 'OVERPAID';
-          this.dom.posStatusBadge.style.color = '#f59e0b';
-        } else {
-          this.dom.posDifferenceTag.innerHTML = `<strong style="color: #10b981;" class="font-mono">EXACT MATCH</strong>`;
-          this.dom.posStatusBadge.textContent = 'EXACT MATCH';
-          this.dom.posStatusBadge.style.color = '#10b981';
-        }
-      }
-
-      if (!this.dom.paymentMatItems) return;
-      this.dom.paymentMatItems.innerHTML = '';
-      if (this.paymentTray.length === 0) {
-        this.dom.paymentMatItems.innerHTML = `
-          <span class="mat-placeholder">Select banknotes and coins above to place into tray</span>
-        `;
-        return;
-      }
-
-      this.paymentTray.forEach((val) => {
-        const chip = document.createElement('span');
-        let chipClass = 'chip-rm1';
-        let label = `RM ${val.toFixed(2)}`;
-
-        if (val === 50) { chipClass = 'chip-rm50'; label = 'RM 50'; }
-        else if (val === 20) { chipClass = 'chip-rm20'; label = 'RM 20'; }
-        else if (val === 10) { chipClass = 'chip-rm10'; label = 'RM 10'; }
-        else if (val === 5) { chipClass = 'chip-rm5'; label = 'RM 5'; }
-        else if (val === 1) { chipClass = 'chip-rm1'; label = 'RM 1'; }
-        else if (val < 1) {
-          chipClass = 'chip-coin';
-          label = `${Math.round(val * 100)}c`;
-        }
-
-        chip.className = `tray-chip ${chipClass}`;
-        chip.textContent = label;
-        this.dom.paymentMatItems.appendChild(chip);
-      });
-    }
-
-    validateAndCheckout() {
-      if (!this.isPlaying) return;
-
-      const task = CHALLENGES[this.currentTaskIdx];
-
-      // 1. Verify basket matches shopping list requirements
-      let basketMatches = true;
-      for (const reqItem of task.items) {
-        const inBasket = this.basket[reqItem.id] || 0;
-        if (inBasket !== reqItem.qty) {
-          basketMatches = false;
-          break;
-        }
-      }
-
-      const requestedIds = task.items.map(i => i.id);
-      for (const bId of Object.keys(this.basket)) {
-        if (!requestedIds.includes(bId)) {
-          basketMatches = false;
-          break;
-        }
-      }
-
-      if (!basketMatches) {
-        this.audio.playWrongBuzz();
-        this.triggerShake();
-        this.setCashierSpeech(`"Your basket doesn't match the shopping list yet! Please check what items are requested."`);
-        this.showHint(`Please collect the exact items from the shopping list first!`);
-        return;
-      }
-
-      // 2. Verify payment amount
-      const trayTotal = this.getTrayTotal();
-      const targetTotal = task.targetTotal;
-
-      if (trayTotal === targetTotal) {
-        this.handleSuccessfulPayment(task, targetTotal);
-      } else {
-        this.handleIncorrectPayment(task, trayTotal, targetTotal);
-      }
-    }
-
-    handleSuccessfulPayment(task, amount) {
-      this.audio.playKaChing();
-      this.audio.playSuccessFanfare();
-
-      const earnedPoints = 150 + Math.max(0, this.timeLeft * 2);
-      this.score += earnedPoints;
-      this.totalSpent += amount;
-
-      this.updateHUD();
-      this.setCashierSpeech(`"Ka-Ching! Exact payment received! Here is your official receipt!"`);
-
-      if (this.dom.receiptTaskName) this.dom.receiptTaskName.textContent = task.title;
-      if (this.dom.receiptTotalAmount) this.dom.receiptTotalAmount.textContent = `RM ${amount.toFixed(2)}`;
-      if (this.dom.receiptPaidAmount) this.dom.receiptPaidAmount.textContent = `RM ${amount.toFixed(2)}`;
-      if (this.dom.successPoints) this.dom.successPoints.textContent = `+${earnedPoints} PTS`;
-      if (this.dom.checkoutSuccessModal) this.dom.checkoutSuccessModal.classList.remove('hidden');
-    }
-
-    handleIncorrectPayment(task, paid, target) {
-      this.audio.playWrongBuzz();
-      this.triggerShake();
-      this.lives--;
-      this.updateHUD();
-
-      const diff = Math.round((target - paid) * 100) / 100;
-      if (paid < target) {
-        this.setCashierSpeech(`"You placed RM ${paid.toFixed(2)}. Total is RM ${target.toFixed(2)} — you need RM ${diff.toFixed(2)} more!"`);
-        this.showHint(`You placed RM ${paid.toFixed(2)}, but total is RM ${target.toFixed(2)}. You need RM ${diff.toFixed(2)} more! ${task.hint}`);
-      } else {
-        this.setCashierSpeech(`"You placed RM ${paid.toFixed(2)}. That's over by RM ${Math.abs(diff).toFixed(2)}!"`);
-        this.showHint(`You placed RM ${paid.toFixed(2)}. That's over by RM ${Math.abs(diff).toFixed(2)}! ${task.hint}`);
-      }
-
-      if (this.lives <= 0) {
-        setTimeout(() => {
-          this.endGame(false, 'Out of accuracy lives! Check your change carefully next time.');
-        }, 1200);
-      }
-    }
-
-    proceedToNextTask() {
-      if (this.dom.checkoutSuccessModal) this.dom.checkoutSuccessModal.classList.add('hidden');
-      this.currentTaskIdx++;
-
-      if (this.currentTaskIdx >= CHALLENGES.length) {
-        this.endGame(true, 'Outstanding! You completed all 10 shopping challenges!');
-      } else {
-        this.loadTask(this.currentTaskIdx);
-      }
-    }
-
-    endGame(completedAll, message) {
-      if (this.gameEnded) return;
-      this.gameEnded = true;
-
-      this.isPlaying = false;
-      this.audio.stopBGM();
-      if (this.timerInterval) clearInterval(this.timerInterval);
-
-      if (this.dom.endTitle) {
-        this.dom.endTitle.textContent = completedAll ? 'SUPERMARKET CHAMPION!' : 'SHIFT COMPLETED!';
-      }
-      if (this.dom.endSubtitle) {
-        this.dom.endSubtitle.textContent = message;
-      }
-
-      let stars = 1;
-      if (completedAll && this.lives === 3) {
-        stars = 3;
-      } else if (completedAll || this.currentTaskIdx >= 6) {
-        stars = 2;
-      } else if (this.score > 200) {
-        stars = 1;
-      }
-
-      localStorage.setItem('math_shop_stars', stars);
-
-      if (this.dom.starsContainer) {
-        const starSlots = this.dom.starsContainer.querySelectorAll('.star-slot');
-        starSlots.forEach((slot, idx) => {
-          if (idx < stars) {
-            slot.classList.add('earned');
-          } else {
-            slot.classList.remove('earned');
-          }
-        });
-      }
-
-      if (this.dom.finalScoreVal) this.dom.finalScoreVal.textContent = String(this.score).padStart(6, '0');
-      if (this.dom.finalTasksVal) {
-        const cur = String(Math.min(CHALLENGES.length, this.currentTaskIdx)).padStart(2, '0');
-        const tot = String(CHALLENGES.length).padStart(2, '0');
-        this.dom.finalTasksVal.textContent = `${cur} / ${tot}`;
-      }
-      if (this.dom.finalLivesVal) this.dom.finalLivesVal.textContent = `${this.lives} / ${this.maxLives}`;
-      if (this.dom.finalSpentVal) this.dom.finalSpentVal.textContent = `RM ${this.totalSpent.toFixed(2)}`;
-
-      const timeTaken = Math.max(1, Math.round((Date.now() - this.startTime) / 1000));
-
-      // StuCent runtime contract integration
-      if (window.game && typeof window.game.end === 'function') {
-        const targetMax = (window.game.config && window.game.config.maxPoints) || 100;
-        const normalizedScore = Math.min(targetMax, Math.round((this.score / 2000) * targetMax));
-        window.game.end({
-          score: normalizedScore,
-          maxScore: targetMax,
-          timeTaken: timeTaken,
-          success: completedAll || stars >= 1
-        });
-      }
-
-      if (this.dom.endScreen) this.dom.endScreen.classList.remove('hidden');
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume();
     }
   }
 
-  // Initialize StuCent runtime game contract
+  function startShopBGM() {
+    initAudio();
+    if (!audioCtx || bgmInterval) return;
+
+    // Upbeat Supermarket Arcade Groove in F Major (120 BPM)
+    const bassline = [
+      174.61, 0, 261.63, 0,  220.00, 0, 261.63, 0,
+      196.00, 0, 293.66, 0,  261.63, 0, 293.66, 0,
+      174.61, 0, 261.63, 0,  220.00, 0, 261.63, 0,
+      220.00, 0, 261.63, 0,  174.61, 0, 0, 0
+    ];
+
+    const leadMelody = [
+      349.23, 0, 440.00, 0,  523.25, 0, 440.00, 0,
+      392.00, 0, 523.25, 0,  440.00, 0, 392.00, 0,
+      349.23, 0, 440.00, 0,  523.25, 0, 587.33, 0,
+      523.25, 0, 440.00, 0,  349.23, 0, 0, 0
+    ];
+
+    const stepDuration = (60 / 120) / 4;
+    bgmStep = 0;
+
+    bgmInterval = setInterval(() => {
+      if (isMuted || !audioCtx || !isPlaying || isGameOver) return;
+      const t = audioCtx.currentTime;
+      const idx = bgmStep % 32;
+
+      const bFreq = bassline[idx];
+      if (bFreq > 0) {
+        try {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(bFreq, t);
+          gain.gain.setValueAtTime(0.06, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + stepDuration * 1.5);
+          osc.connect(gain);
+          gain.connect(bgmMasterGain);
+          osc.start(t);
+          osc.stop(t + stepDuration * 1.6);
+        } catch (e) {}
+      }
+
+      const lFreq = leadMelody[idx];
+      if (lFreq > 0) {
+        try {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(lFreq, t);
+          gain.gain.setValueAtTime(0.035, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + stepDuration * 1.3);
+          osc.connect(gain);
+          gain.connect(bgmMasterGain);
+          osc.start(t);
+          osc.stop(t + stepDuration * 1.4);
+        } catch (e) {}
+      }
+
+      bgmStep++;
+    }, stepDuration * 1000);
+  }
+
+  function stopShopBGM() {
+    if (bgmInterval) {
+      clearInterval(bgmInterval);
+      bgmInterval = null;
+    }
+  }
+
+  function beep(freq, durationMs, type = 'sine', vol = 0.15, delaySec = 0) {
+    if (isMuted) return;
+    initAudio();
+    if (!audioCtx) return;
+
+    try {
+      const t = audioCtx.currentTime + delaySec;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, t);
+      gain.gain.setValueAtTime(vol, t);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + durationMs / 1000);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(t);
+      osc.stop(t + durationMs / 1000);
+    } catch (e) {}
+  }
+
+  function playRestockSound() {
+    beep(587.33, 60, 'triangle', 0.18);
+    beep(880.00, 100, 'sine', 0.15, 0.05);
+  }
+
+  function playSuccessChime() {
+    [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+      beep(f, 160, 'triangle', 0.2, i * 0.08);
+    });
+  }
+
+  function playWrongSound() {
+    beep(180, 240, 'sawtooth', 0.2);
+    beep(130, 260, 'square', 0.16, 0.08);
+  }
+
+  function playCashChime() {
+    beep(1200, 80, 'sine', 0.2);
+    beep(1800, 120, 'triangle', 0.15, 0.06);
+  }
+
+  // ==========================================================================
+  // 2. PRODUCT DEFINITIONS (PURE VECTOR SVG GRAPHICS)
+  // ==========================================================================
+  const PRODUCTS = {
+    apples: {
+      id: 'apples',
+      name: 'Fresh Apples',
+      color: '#ef4444',
+      svg: `<svg viewBox="0 0 24 24" fill="#ef4444"><path d="M12 4c-1.5-1.5-3-2-5-2C4 2 2 4 2 7c0 4.5 5 10 10 13 5-3 10-8.5 10-13 0-3-2-5-5-5-2 0-3.5.5-5 2z"/><path d="M12 4V1" stroke="#16a34a" stroke-width="2" stroke-linecap="round"/></svg>`
+    },
+    milk: {
+      id: 'milk',
+      name: 'Fresh Milk',
+      color: '#38bdf8',
+      svg: `<svg viewBox="0 0 24 24" fill="#38bdf8"><path d="M7 4h10v2H7V4zm1 3h8l1 14H7L8 7zm2 4h4v6h-4v-6z"/></svg>`
+    },
+    bread: {
+      id: 'bread',
+      name: 'Crusty Bread',
+      color: '#f59e0b',
+      svg: `<svg viewBox="0 0 24 24" fill="#f59e0b"><path d="M3 12c0-3.5 3.5-6 9-6s9 2.5 9 6c0 3-2 5-4 6H7c-2-1-4-3-4-6zm5-2v4m4-4v4m4-4v4" stroke="#78350f" stroke-width="1.5" stroke-linecap="round"/></svg>`
+    },
+    cereal: {
+      id: 'cereal',
+      name: 'Crunchy Cereal',
+      color: '#a855f7',
+      svg: `<svg viewBox="0 0 24 24" fill="#a855f7"><path d="M5 4h14v16H5V4zm3 4h8v3H8V8zm2 5h4v4h-4v-4z"/></svg>`
+    }
+  };
+
+  // ==========================================================================
+  // 3. CAMBRIDGE YEAR 3/4 DISPLAYING & INTERPRETING DATA ROUNDS (10 ROUNDS)
+  // ==========================================================================
+  const ROUNDS = [
+    // STAGE 1: CHECK THE STOCK (PICTOGRAPHS & LEAST / MOST)
+    {
+      roundNum: 1,
+      mode: 'restock',
+      chartType: 'pictograph',
+      badge: 'ROUND 01 • STOCK PICTOGRAPH (LEAST STOCK)',
+      title: 'RESTOCK THE LOWEST PRODUCT: FRESH APPLES (2 UNITS)',
+      tip: 'Look at the pictograph! Apples has only 2 icons. Restock its shelf!',
+      chartTitle: 'CURRENT AISLE STOCK (PICTOGRAPH)',
+      scaleTag: '1 ICON = 1 UNIT',
+      data: { milk: 6, bread: 5, apples: 2, cereal: 7 },
+      targetKeys: ['apples'],
+      successMessage: 'Apples restocked! Stock chart updated from 2 to 8 units.'
+    },
+    {
+      roundNum: 2,
+      mode: 'restock',
+      chartType: 'pictograph',
+      badge: 'ROUND 02 • STOCK PICTOGRAPH (COMPARING QUANTITIES)',
+      title: 'RESTOCK CRUSTY BREAD (3 UNITS) TO REACH 7 UNITS',
+      tip: 'Bread has only 3 units. Tap RESTOCK on the Bread shelf!',
+      chartTitle: 'SUPERMARKET INVENTORY (PICTOGRAPH)',
+      scaleTag: '1 ICON = 1 UNIT',
+      data: { milk: 8, bread: 3, apples: 7, cereal: 5 },
+      targetKeys: ['bread'],
+      successMessage: 'Bread shelf restocked to full capacity!'
+    },
+    {
+      roundNum: 3,
+      mode: 'restock',
+      chartType: 'bar_threshold',
+      badge: 'ROUND 03 • QUANTITY BARS (LOW STOCK THRESHOLD)',
+      title: 'RESTOCK ALL ITEMS BELOW 4 UNITS (APPLES & CEREAL)',
+      tip: 'Items below 4 units are in the RED alert zone. Restock both!',
+      chartTitle: 'STOCK LEVEL GAUGE (CRITICAL < 4)',
+      scaleTag: 'RED = LOW STOCK',
+      threshold: 4,
+      data: { milk: 7, bread: 6, apples: 2, cereal: 3 },
+      targetKeys: ['apples', 'cereal'],
+      successMessage: 'Both low-stock items restocked above threshold!'
+    },
+
+    // STAGE 2: SALES RUSH (BAR CHARTS & MOST POPULAR)
+    {
+      roundNum: 4,
+      mode: 'restock',
+      chartType: 'barchart',
+      badge: 'ROUND 04 • TODAY\'S SALES BAR CHART (TOP SELLER)',
+      title: 'RESTOCK THE TOP SELLER: FRESH MILK (9 SOLD TODAY)',
+      tip: 'Check the bar chart! Milk has the longest bar (9 sold). Restock Milk!',
+      chartTitle: 'TODAY\'S CUSTOMER SALES (BAR CHART)',
+      scaleTag: 'UNITS SOLD TODAY',
+      data: { milk: 9, bread: 4, apples: 6, cereal: 3 },
+      targetKeys: ['milk'],
+      successMessage: 'Top seller Milk restocked for evening shoppers!'
+    },
+    {
+      roundNum: 5,
+      mode: 'restock',
+      chartType: 'barchart',
+      badge: 'ROUND 05 • SALES DIFFERENCE (FINDING DIFFERENCES)',
+      title: 'RESTOCK APPLES (SOLD 3 vs MILK SOLD 8 — DIFFERENCE: 5)',
+      tip: 'Milk sold 8 and Apples sold 3. The difference is 8 - 3 = 5. Restock Apples!',
+      chartTitle: 'SALES COMPARISON (BAR CHART)',
+      scaleTag: '8 - 3 = 5 UNITS',
+      data: { milk: 8, bread: 7, apples: 3, cereal: 5 },
+      targetKeys: ['apples'],
+      successMessage: 'Apples restocked to balance inventory!'
+    },
+    {
+      roundNum: 6,
+      mode: 'restock',
+      chartType: 'barchart',
+      badge: 'ROUND 06 • CUSTOMER DEMAND (MOST POPULAR)',
+      title: 'RESTOCK CRUSTY BREAD (HIGHEST DEMAND: 10 CUSTOMERS)',
+      tip: 'Bread has the highest demand on the chart (10). Restock Bread!',
+      chartTitle: 'CUSTOMER DEMAND FORECAST',
+      scaleTag: 'CUSTOMERS WAITING',
+      data: { milk: 5, bread: 10, apples: 4, cereal: 8 },
+      targetKeys: ['bread'],
+      successMessage: 'Demand satisfied! +RM 10.00 Supermarket Bonus!'
+    },
+
+    // STAGE 3: BUILD THE DISPLAY (ORDERING DATA FROM GREATEST TO SMALLEST)
+    {
+      roundNum: 7,
+      mode: 'ordering',
+      chartType: 'pictograph',
+      badge: 'ROUND 07 • ORDERING SALES (MOST SOLD → LEAST SOLD)',
+      title: 'ARRANGE FEATURED DISPLAY: MOST SOLD TO LEAST SOLD',
+      tip: 'Order: Milk (8) > Cereal (6) > Bread (4) > Apples (2)',
+      chartTitle: 'WEEKLY SALES DATA (PICTOGRAPH)',
+      scaleTag: '1 ICON = 1 UNIT',
+      data: { milk: 8, cereal: 6, bread: 4, apples: 2 },
+      correctOrder: ['milk', 'cereal', 'bread', 'apples'],
+      successMessage: 'Featured display perfectly arranged by sales volume!'
+    },
+    {
+      roundNum: 8,
+      mode: 'ordering',
+      chartType: 'barchart',
+      badge: 'ROUND 08 • ORDERING STOCK (LOWEST STOCK FIRST)',
+      title: 'ORDER DELIVERY PRIORITY: LEAST STOCK TO MOST STOCK',
+      tip: 'Order: Apples (1) < Bread (3) < Milk (6) < Cereal (9)',
+      chartTitle: 'WAREHOUSE STOCK LEVELS (BAR CHART)',
+      scaleTag: 'DELIVERY PRIORITY',
+      data: { apples: 1, bread: 3, milk: 6, cereal: 9 },
+      correctOrder: ['apples', 'bread', 'milk', 'cereal'],
+      successMessage: 'Delivery truck loaded by stock urgency!'
+    },
+
+    // STAGE 4: COMPARE THE DATA & SUPERMARKET MANAGER FINALE
+    {
+      roundNum: 9,
+      mode: 'restock',
+      chartType: 'dual_comparison',
+      badge: 'ROUND 09 • 2-DAY SALES COMPARISON (MONDAY vs TUESDAY)',
+      title: 'RESTOCK PRODUCT WITH BIGGEST SALES INCREASE: MILK (+4)',
+      tip: 'Milk sales doubled from 4 (Mon) to 8 (Tue) (+4 jump). Restock Milk!',
+      chartTitle: 'MONDAY (BLUE) vs TUESDAY (GOLD) SALES',
+      scaleTag: '2-DAY TREND',
+      dataMon: { milk: 4, bread: 7, apples: 3, cereal: 6 },
+      dataTue: { milk: 8, bread: 5, apples: 6, cereal: 6 },
+      targetKeys: ['milk'],
+      successMessage: 'Fastest-growing product Milk successfully replenished!'
+    },
+    {
+      roundNum: 10,
+      mode: 'restock',
+      chartType: 'barchart',
+      badge: 'ROUND 10 • GRAND SUPERMARKET MANAGER CHALLENGE',
+      title: 'RESTOCK CRITICAL HIGH-SALES LOW-STOCK ITEMS (MILK & APPLES)',
+      tip: 'Both Milk (Sold 8, Stock 2) & Apples (Sold 7, Stock 3) need restocking!',
+      chartTitle: 'END-OF-DAY MANAGER REPORT',
+      scaleTag: 'MANAGER AUDIT',
+      data: { milk: 8, apples: 7, cereal: 5, bread: 3 },
+      targetKeys: ['milk', 'apples'],
+      successMessage: 'SUPERMARKET MASTER! All data interpreted and shift completed!'
+    }
+  ];
+
+  // ==========================================================================
+  // 4. GAME STATE
+  // ==========================================================================
+  let currentRoundIdx = 0;
+  let score = 0;
+  let lives = 3;
+  let combo = 1;
+  let bestCombo = 1;
+  let totalTasksDone = 0;
+  let totalAttempts = 0;
+  let timeRemaining = 90;
+  let gameTimerInterval = null;
+  let gameStartTime = 0;
+  let isPlaying = false;
+  let isGameOver = false;
+
+  // Active round progress state
+  let currentRestockedKeys = new Set();
+  let currentRankingSlots = [null, null, null, null]; // [0..3] holds product id
+
+  // ==========================================================================
+  // 5. SCREEN & HUD MANAGEMENT
+  // ==========================================================================
+  function setScreen(screenId) {
+    const screens = ['start-screen', 'countdown-screen', 'instructions-modal', 'game-over-screen'];
+    screens.forEach(id => {
+      const el = getEl(id);
+      if (el) {
+        if (id === screenId) {
+          el.classList.remove('hidden');
+          el.classList.add('active');
+        } else {
+          el.classList.add('hidden');
+          el.classList.remove('active');
+        }
+      }
+    });
+  }
+
+  function updateHUD() {
+    const scoreEl = getEl('score-display');
+    const timerEl = getEl('timer-display');
+    const roundEl = getEl('round-display');
+    const comboEl = getEl('combo-display');
+
+    if (scoreEl) scoreEl.textContent = String(score).padStart(6, '0');
+    if (timerEl) timerEl.textContent = String(Math.max(0, timeRemaining)).padStart(3, '0');
+    if (roundEl) roundEl.textContent = `${String(currentRoundIdx + 1).padStart(2, '0')} / 10`;
+    if (comboEl) comboEl.textContent = `${combo}x`;
+
+    const heartsContainer = getEl('lives-container');
+    if (heartsContainer) {
+      let heartsHtml = '';
+      for (let i = 0; i < 3; i++) {
+        const isFull = i < lives;
+        heartsHtml += `<span class="heart-icon ${isFull ? 'active' : 'lost'}"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></span>`;
+      }
+      heartsContainer.innerHTML = heartsHtml;
+    }
+  }
+
+  function showHint(text) {
+    const hintBanner = getEl('hint-banner');
+    const hintText = getEl('hint-text');
+    if (hintBanner && hintText) {
+      hintText.textContent = text;
+      hintBanner.classList.remove('hidden');
+      setTimeout(() => {
+        hintBanner.classList.add('hidden');
+      }, 4000);
+    }
+  }
+
+  // ==========================================================================
+  // 6. DYNAMIC DATA CHART RENDERER (LEFT TERMINAL)
+  // ==========================================================================
+  function renderChart(roundData) {
+    const chartTitleEl = getEl('chart-title');
+    const chartScaleEl = getEl('chart-scale-tag');
+    const chartViewport = getEl('chart-viewport');
+
+    if (chartTitleEl) chartTitleEl.textContent = roundData.chartTitle;
+    if (chartScaleEl) chartScaleEl.textContent = roundData.scaleTag;
+    if (!chartViewport) return;
+
+    chartViewport.innerHTML = '';
+
+    if (roundData.chartType === 'pictograph') {
+      // 1. PICTOGRAPH RENDERING
+      const keys = Object.keys(roundData.data);
+      keys.forEach(k => {
+        const prod = PRODUCTS[k];
+        const count = roundData.data[k];
+
+        const row = document.createElement('div');
+        row.className = 'picto-row';
+        if (roundData.targetKeys && roundData.targetKeys.includes(k) && currentRestockedKeys.has(k)) {
+          row.classList.add('highlighted');
+        }
+
+        let iconsHtml = '';
+        for (let i = 0; i < count; i++) {
+          iconsHtml += `<span class="picto-icon" title="${prod.name}">${prod.svg}</span>`;
+        }
+
+        row.innerHTML = `
+          <div class="picto-label-wrap">
+            <span class="picto-name">${prod.name}</span>
+            <span class="picto-count font-mono">${count} Units</span>
+          </div>
+          <div class="picto-icons-cell">
+            ${iconsHtml}
+          </div>
+        `;
+        chartViewport.appendChild(row);
+      });
+
+    } else if (roundData.chartType === 'barchart' || roundData.chartType === 'bar_threshold') {
+      // 2. BAR CHART / QUANTITY GAUGE RENDERING
+      const chartWrap = document.createElement('div');
+      chartWrap.className = 'bar-chart-wrap';
+
+      const keys = Object.keys(roundData.data);
+      const maxVal = 10;
+
+      keys.forEach(k => {
+        const prod = PRODUCTS[k];
+        const val = roundData.data[k];
+        const pct = Math.min(100, Math.round((val / maxVal) * 100));
+        const isBelowThresh = roundData.threshold && val < roundData.threshold;
+
+        const row = document.createElement('div');
+        row.className = 'bar-row';
+
+        const barColor = isBelowThresh ? '#ef4444' : prod.color;
+
+        row.innerHTML = `
+          <span class="bar-label">${prod.name}</span>
+          <div class="bar-track">
+            <div class="bar-fill" style="width: ${pct}%; background: ${barColor};">
+              <span class="bar-val-text">${val}</span>
+            </div>
+          </div>
+        `;
+        chartWrap.appendChild(row);
+      });
+
+      chartViewport.appendChild(chartWrap);
+
+    } else if (roundData.chartType === 'dual_comparison') {
+      // 3. 2-DAY SIDE-BY-SIDE COMPARISON CHART
+      const chartWrap = document.createElement('div');
+      chartWrap.className = 'bar-chart-wrap';
+
+      const keys = Object.keys(roundData.dataMon);
+      keys.forEach(k => {
+        const prod = PRODUCTS[k];
+        const monVal = roundData.dataMon[k];
+        const tueVal = roundData.dataTue[k];
+        const monPct = Math.min(100, Math.round((monVal / 10) * 100));
+        const tuePct = Math.min(100, Math.round((tueVal / 10) * 100));
+        const diff = tueVal - monVal;
+        const diffTag = diff > 0 ? `+${diff}` : `${diff}`;
+
+        const row = document.createElement('div');
+        row.className = 'bar-row';
+        row.innerHTML = `
+          <span class="bar-label">${prod.name} <small style="color:${diff > 0 ? '#10b981':'#94a3b8'}">(${diffTag})</small></span>
+          <div class="dual-bar-wrap">
+            <div class="dual-bar-item dual-bar-mon" style="width: ${monPct}%;">Mon: ${monVal}</div>
+            <div class="dual-bar-item dual-bar-tue" style="width: ${tuePct}%;">Tue: ${tueVal}</div>
+          </div>
+        `;
+        chartWrap.appendChild(row);
+      });
+
+      chartViewport.appendChild(chartWrap);
+    }
+  }
+
+  // ==========================================================================
+  // 7. INTERACTIVE ACTION ZONE (RIGHT PANE)
+  // ==========================================================================
+  function setupRoundView(roundData) {
+    const missionBadge = getEl('round-badge');
+    const taskTitle = getEl('task-title-text');
+    const taskSub = getEl('task-subtext');
+    const shelvesView = getEl('shelves-view');
+    const rankingView = getEl('ranking-view');
+    const deliveryDock = getEl('delivery-dock');
+
+    if (missionBadge) missionBadge.textContent = roundData.badge;
+    if (taskTitle) taskTitle.textContent = roundData.title;
+    if (taskSub) taskSub.textContent = roundData.tip;
+
+    currentRestockedKeys.clear();
+    currentRankingSlots = [null, null, null, null];
+
+    renderChart(roundData);
+
+    if (roundData.mode === 'restock') {
+      if (shelvesView) shelvesView.classList.remove('hidden');
+      if (rankingView) rankingView.classList.add('hidden');
+      if (deliveryDock) deliveryDock.classList.remove('hidden');
+      renderShelves(roundData);
+      renderCrateDock(roundData);
+
+    } else if (roundData.mode === 'ordering') {
+      if (shelvesView) shelvesView.classList.add('hidden');
+      if (rankingView) rankingView.classList.remove('hidden');
+      if (deliveryDock) deliveryDock.classList.add('hidden');
+      renderRankingPodium(roundData);
+    }
+
+    updateHUD();
+  }
+
+  function renderShelves(roundData) {
+    const shelvesView = getEl('shelves-view');
+    if (!shelvesView) return;
+
+    shelvesView.innerHTML = '';
+    const keys = ['apples', 'milk', 'bread', 'cereal'];
+
+    keys.forEach(k => {
+      const prod = PRODUCTS[k];
+      const stockVal = roundData.data ? (roundData.data[k] || 5) : 5;
+      const isTarget = roundData.targetKeys && roundData.targetKeys.includes(k);
+      const isDone = currentRestockedKeys.has(k);
+
+      const card = document.createElement('div');
+      card.className = 'shelf-card';
+      if (isTarget && !isDone) card.classList.add('low-stock', 'target-glow');
+
+      // Shelf items preview icons
+      let itemsHtml = '';
+      const displayCount = isDone ? 8 : stockVal;
+      for (let i = 0; i < displayCount; i++) {
+        itemsHtml += `<span class="picto-icon" style="width:18px;height:18px;">${prod.svg}</span>`;
+      }
+
+      const btnLabel = isDone ? 'RESTOCKED ✓' : `RESTOCK ${prod.name.toUpperCase()}`;
+
+      card.innerHTML = `
+        <div class="shelf-top-row">
+          <span class="shelf-prod-name">${prod.name}</span>
+          <span class="shelf-stock-pill ${isTarget && !isDone ? 'danger' : ''}">${displayCount} Units</span>
+        </div>
+        <div class="shelf-items-rack">
+          ${itemsHtml}
+        </div>
+        <button class="shelf-restock-btn" data-key="${k}" ${isDone ? 'disabled' : ''}>
+          ${btnLabel}
+        </button>
+      `;
+
+      const restockBtn = card.querySelector('.shelf-restock-btn');
+      if (restockBtn) {
+        restockBtn.addEventListener('click', () => handleRestockClick(k, roundData));
+      }
+
+      shelvesView.appendChild(card);
+    });
+  }
+
+  function renderCrateDock(roundData) {
+    const dockContainer = getEl('dock-crates-container');
+    if (!dockContainer) return;
+
+    dockContainer.innerHTML = '';
+    const keys = ['apples', 'milk', 'bread', 'cereal'];
+
+    keys.forEach(k => {
+      const prod = PRODUCTS[k];
+      const pill = document.createElement('div');
+      pill.className = 'crate-pill';
+      pill.innerHTML = `📦 ${prod.name}`;
+      pill.addEventListener('click', () => handleRestockClick(k, roundData));
+      dockContainer.appendChild(pill);
+    });
+  }
+
+  function handleRestockClick(productKey, roundData) {
+    if (!isPlaying || isGameOver) return;
+    totalAttempts++;
+
+    const isTarget = roundData.targetKeys && roundData.targetKeys.includes(productKey);
+
+    if (isTarget) {
+      // CORRECT RESTOCK ACTION
+      currentRestockedKeys.add(productKey);
+      playRestockSound();
+      playCashChime();
+
+      score += 70 * combo;
+      combo = Math.min(8, combo + 1);
+      if (combo > bestCombo) bestCombo = combo;
+
+      renderShelves(roundData);
+      renderChart(roundData);
+      updateHUD();
+
+      // Check if all targets in this round are completed
+      const allDone = roundData.targetKeys.every(k => currentRestockedKeys.has(k));
+      if (allDone) {
+        playSuccessChime();
+        totalTasksDone++;
+        showHint(roundData.successMessage);
+
+        setTimeout(() => {
+          if (currentRoundIdx + 1 < ROUNDS.length) {
+            currentRoundIdx++;
+            setupRoundView(ROUNDS[currentRoundIdx]);
+          } else {
+            endGame(true);
+          }
+        }, 800);
+      }
+
+    } else {
+      // INCORRECT RESTOCK SELECTION
+      playWrongSound();
+      lives--;
+      combo = 1;
+      updateHUD();
+      showHint(`Not ${PRODUCTS[productKey].name}! Check the data chart for the target item.`);
+
+      if (lives <= 0) {
+        endGame(false);
+      }
+    }
+  }
+
+  // ==========================================================================
+  // 8. ORDERING PODIUM (FEATURED DISPLAY)
+  // ==========================================================================
+  function renderRankingPodium(roundData) {
+    const podiumContainer = getEl('ranking-podium');
+    const dockContainer = getEl('ranking-dock');
+    if (!podiumContainer || !dockContainer) return;
+
+    podiumContainer.innerHTML = '';
+    dockContainer.innerHTML = '';
+
+    const labels = ['1st (Greatest)', '2nd', '3rd', '4th (Smallest)'];
+
+    // 4 Slots
+    for (let i = 0; i < 4; i++) {
+      const slot = document.createElement('div');
+      const filledKey = currentRankingSlots[i];
+      slot.className = `podium-slot ${filledKey ? 'filled' : ''}`;
+
+      if (filledKey) {
+        const prod = PRODUCTS[filledKey];
+        slot.innerHTML = `
+          <span class="podium-rank-badge">${labels[i]}</span>
+          <span class="picto-icon" style="width:28px;height:28px;">${prod.svg}</span>
+          <span style="font-family:var(--display-font);font-size:0.8rem;font-weight:900;color:#fff;">${prod.name}</span>
+        `;
+        slot.addEventListener('click', () => {
+          currentRankingSlots[i] = null;
+          renderRankingPodium(roundData);
+        });
+      } else {
+        slot.innerHTML = `
+          <span class="podium-rank-badge">${labels[i]}</span>
+          <span style="font-size:0.75rem;color:var(--text-dim);">[ Empty ]</span>
+        `;
+      }
+      podiumContainer.appendChild(slot);
+    }
+
+    // Available Products in Dock
+    const placedSet = new Set(currentRankingSlots.filter(Boolean));
+    const allKeys = ['apples', 'milk', 'bread', 'cereal'];
+
+    allKeys.forEach(k => {
+      if (!placedSet.has(k)) {
+        const prod = PRODUCTS[k];
+        const card = document.createElement('div');
+        card.className = 'dock-product-card';
+        card.innerHTML = `
+          <span class="picto-icon" style="width:20px;height:20px;">${prod.svg}</span>
+          <span>${prod.name}</span>
+        `;
+        card.addEventListener('click', () => {
+          // Place into first open slot
+          const firstOpen = currentRankingSlots.indexOf(null);
+          if (firstOpen !== -1) {
+            currentRankingSlots[firstOpen] = k;
+            playRestockSound();
+            renderRankingPodium(roundData);
+          }
+        });
+        dockContainer.appendChild(card);
+      }
+    });
+
+    // Reset & Submit Buttons
+    const resetBtn = getEl('btn-reset-ranking');
+    const submitBtn = getEl('btn-submit-ranking');
+
+    if (resetBtn) {
+      resetBtn.onclick = () => {
+        currentRankingSlots = [null, null, null, null];
+        renderRankingPodium(roundData);
+      };
+    }
+
+    if (submitBtn) {
+      submitBtn.onclick = () => submitRankingOrder(roundData);
+    }
+  }
+
+  function submitRankingOrder(roundData) {
+    if (!isPlaying || isGameOver) return;
+
+    if (currentRankingSlots.includes(null)) {
+      showHint('Please place all 4 products onto the podium slots!');
+      playWrongSound();
+      return;
+    }
+
+    totalAttempts++;
+    const isCorrect = roundData.correctOrder.every((k, i) => currentRankingSlots[i] === k);
+
+    if (isCorrect) {
+      playSuccessChime();
+      playCashChime();
+      totalTasksDone++;
+      score += 100 * combo;
+      combo = Math.min(8, combo + 1);
+      if (combo > bestCombo) bestCombo = combo;
+      updateHUD();
+
+      showHint(roundData.successMessage);
+
+      setTimeout(() => {
+        if (currentRoundIdx + 1 < ROUNDS.length) {
+          currentRoundIdx++;
+          setupRoundView(ROUNDS[currentRoundIdx]);
+        } else {
+          endGame(true);
+        }
+      }, 900);
+
+    } else {
+      playWrongSound();
+      lives--;
+      combo = 1;
+      updateHUD();
+      showHint('Incorrect order! Check the quantities on the left chart.');
+
+      if (lives <= 0) {
+        endGame(false);
+      }
+    }
+  }
+
+  // ==========================================================================
+  // 9. START, COUNTDOWN & END GAME
+  // ==========================================================================
+  function startGame() {
+    currentRoundIdx = 0;
+    score = 0;
+    lives = 3;
+    combo = 1;
+    bestCombo = 1;
+    totalTasksDone = 0;
+    totalAttempts = 0;
+    timeRemaining = 90;
+    isPlaying = true;
+    isGameOver = false;
+    gameStartTime = Date.now();
+
+    setScreen(null);
+    setupRoundView(ROUNDS[0]);
+    startShopBGM();
+
+    if (gameTimerInterval) clearInterval(gameTimerInterval);
+    gameTimerInterval = setInterval(() => {
+      if (!isPlaying || isGameOver) return;
+      timeRemaining--;
+      updateHUD();
+      if (timeRemaining <= 0) {
+        endGame(totalTasksDone >= 6);
+      }
+    }, 1000);
+  }
+
+  function startCountdown() {
+    initAudio();
+    setScreen('countdown-screen');
+    let count = 3;
+    const numEl = getEl('countdown-number');
+    if (numEl) numEl.textContent = count;
+    beep(440, 100, 'sine', 0.15);
+
+    const interval = setInterval(() => {
+      count--;
+      if (count > 0) {
+        if (numEl) numEl.textContent = count;
+        beep(440, 100, 'sine', 0.15);
+      } else {
+        clearInterval(interval);
+        beep(880, 250, 'sine', 0.2);
+        startGame();
+      }
+    }, 750);
+  }
+
+  function endGame(isVictory) {
+    isPlaying = false;
+    isGameOver = true;
+    stopShopBGM();
+    if (gameTimerInterval) clearInterval(gameTimerInterval);
+
+    const totalTimeTaken = Math.round((Date.now() - gameStartTime) / 1000);
+    const accuracy = totalAttempts > 0 ? Math.round((totalTasksDone / totalAttempts) * 100) : 100;
+
+    let stars = 1;
+    if (score >= 500 && lives >= 2) stars = 3;
+    else if (score >= 280) stars = 2;
+
+    safeStorage.setItem('math_shop_stars', stars);
+
+    if (isVictory) {
+      playSuccessChime();
+    } else {
+      playWrongSound();
+    }
+
+    const badgeEl = getEl('game-over-badge');
+    const titleEl = getEl('game-over-title');
+    const scoreEl = getEl('final-score');
+    const roundsEl = getEl('final-rounds');
+    const accuracyEl = getEl('final-accuracy');
+    const comboEl = getEl('final-combo');
+    const timeEl = getEl('final-time');
+    const starsContainer = getEl('stars-container');
+
+    if (badgeEl) badgeEl.textContent = isVictory ? 'STORE SHIFT COMPLETE' : 'STORE SHIFT FINISHED';
+    if (titleEl) titleEl.textContent = isVictory ? 'SUPERMARKET MASTER!' : 'NICE SHIFT EFFORT!';
+    if (scoreEl) scoreEl.textContent = String(score).padStart(6, '0');
+    if (roundsEl) roundsEl.textContent = `${Math.min(10, currentRoundIdx + (isVictory ? 1 : 0))} / 10`;
+    if (accuracyEl) accuracyEl.textContent = `${accuracy}%`;
+    if (comboEl) comboEl.textContent = `${bestCombo}x`;
+    if (timeEl) timeEl.textContent = `${totalTimeTaken}s`;
+
+    if (starsContainer) {
+      let starsHtml = '';
+      for (let s = 1; s <= 3; s++) {
+        const active = s <= stars ? 'star-active' : '';
+        starsHtml += `<span class="arcade-star ${active}"><svg viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></span>`;
+      }
+      starsContainer.innerHTML = starsHtml;
+    }
+
+    setScreen('game-over-screen');
+
+    // StuCent Reporting Contract
+    if (gameCtx && typeof gameCtx.end === 'function') {
+      const targetMax = (gameCtx.config && gameCtx.config.maxPoints) || 100;
+      const normalizedScore = Math.min(targetMax, Math.round((score / 800) * targetMax));
+      gameCtx.end({
+        score: normalizedScore,
+        maxScore: targetMax,
+        timeTaken: totalTimeTaken,
+        success: isVictory || normalizedScore >= 50
+      });
+    }
+  }
+
+  // ==========================================================================
+  // 10. SETUP EVENT CONTROLS
+  // ==========================================================================
+  function setupControls() {
+    const startBtn = getEl('start-game-btn');
+    const howToBtn = getEl('how-to-play-btn');
+    const hudRulesBtn = getEl('hud-how-to-play-btn');
+    const closeInstBtn = getEl('close-instructions-btn');
+    const startFromInstBtn = getEl('start-from-instructions-btn');
+    const playAgainBtn = getEl('play-again-btn');
+    const soundBtn = getEl('sound-toggle-btn');
+
+    if (startBtn) startBtn.addEventListener('click', startCountdown);
+    if (howToBtn) howToBtn.addEventListener('click', () => setScreen('instructions-modal'));
+    if (hudRulesBtn) hudRulesBtn.addEventListener('click', () => setScreen('instructions-modal'));
+    if (closeInstBtn) closeInstBtn.addEventListener('click', () => setScreen('start-screen'));
+    if (startFromInstBtn) startFromInstBtn.addEventListener('click', startCountdown);
+    if (playAgainBtn) playAgainBtn.addEventListener('click', startCountdown);
+
+    if (soundBtn) {
+      soundBtn.addEventListener('click', () => {
+        isMuted = !isMuted;
+        safeStorage.setItem('math_games_sound', isMuted ? 'false' : 'true');
+        soundBtn.textContent = isMuted ? 'SOUND: OFF' : 'SOUND: ON';
+        if (isMuted) {
+          stopShopBGM();
+        } else if (isPlaying && !isGameOver) {
+          startShopBGM();
+        }
+      });
+    }
+  }
+
+  // ==========================================================================
+  // 11. STUCENT INIT & BOOTSTRAP
+  // ==========================================================================
   window.game = window.game || {};
-  window.game.init = function(config) {
+  window.game.init = function (config) {
     window.game.config = config || {};
   };
 
-  document.addEventListener('DOMContentLoaded', () => {
-    new MathShopGame();
-  });
+  function init() {
+    setupControls();
+  }
+
+  if (doc.readyState === 'loading') {
+    doc.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 
 })();

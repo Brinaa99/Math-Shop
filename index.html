@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Numberland Math Shop — Supermarket Math Adventure</title>
-  <meta name="description" content="Shop for groceries, calculate totals and pay with Malaysian Ringgit in an arcade supermarket simulation.">
+  <title>Math Shop: Data Dash — Supermarket Data Challenge</title>
+  <meta name="description" content="Interpret pictographs, bar charts, and sales data to run an arcade supermarket in Math Shop: Data Dash.">
   
-  <!-- Playful Google Fonts -->
+  <!-- Arcade Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700;800;900&family=Outfit:wght@500;700;800;900&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
@@ -17,11 +17,11 @@
   <div id="game-app">
     <div id="game-container">
 
-      <!-- TOP RETRO CONSOLE HUD -->
+      <!-- TOP RETRO ARCADE HUD -->
       <header id="game-hud" class="hud-panel">
         <div class="hud-left">
           <div class="brand-badge">
-            <span class="brand-text">MATH<span class="brand-pop">SHOP</span></span>
+            <span class="brand-text">DATA<span class="brand-pop">DASH</span></span>
           </div>
           <div class="hud-stat-pill hud-score">
             <span class="hud-label">SCORE</span>
@@ -30,9 +30,9 @@
           <div class="hud-stat-pill hud-lives">
             <span class="hud-label">LIVES</span>
             <div id="lives-container" class="lives-hearts" aria-label="3 lives remaining">
-              <svg class="heart-icon active" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-              <svg class="heart-icon active" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-              <svg class="heart-icon active" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+              <span class="heart-icon active"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></span>
+              <span class="heart-icon active"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></span>
+              <span class="heart-icon active"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></span>
             </div>
           </div>
         </div>
@@ -43,407 +43,231 @@
             <span id="timer-display" class="hud-value font-mono">090</span>
           </div>
           <div class="hud-stat-pill hud-task">
-            <span class="hud-label">TASK</span>
-            <span id="progress-display" class="hud-value font-mono">01 / 10</span>
+            <span class="hud-label">ROUND</span>
+            <span id="round-display" class="hud-value font-mono">01 / 10</span>
+          </div>
+          <div class="hud-stat-pill hud-combo">
+            <span class="hud-label">STREAK</span>
+            <span id="combo-display" class="hud-value font-mono combo-accent">1x</span>
           </div>
         </div>
 
         <div class="hud-right">
-          <button id="hud-how-to-play-btn" class="hud-btn btn-secondary">RULES</button>
-          <button id="sound-toggle-btn" class="hud-btn btn-sound">SOUND ON</button>
-          <button id="hud-restart-btn" class="hud-btn btn-restart" title="Restart Game">RESET</button>
+          <button id="hud-how-to-play-btn" class="hud-btn btn-secondary" title="Rules">RULES</button>
+          <button id="sound-toggle-btn" class="hud-btn btn-sound" title="Toggle Sound">SOUND ON</button>
         </div>
       </header>
 
-      <!-- SHOPPING TASK MISSION BAR (Clipboard List) -->
+      <!-- DATA DASH MISSION BILLBOARD -->
       <section class="task-mission-bar">
-        <div class="clipboard-tag">
-          <svg class="clip-svg" viewBox="0 0 24 24"><path fill="currentColor" d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-          <span>SHOPPING LIST</span>
+        <div class="mission-top-row">
+          <span class="mission-badge" id="round-badge">ROUND 01 &bull; PICTOGRAPH DATA</span>
+          <span class="mission-status-pill" id="mission-status">ACTION REQUIRED</span>
         </div>
         <div class="task-prompt-wrap">
-          <span class="task-title" id="task-title-text">Task 1: Buy 2 Fresh Apples</span>
-          <div class="task-items-checklist" id="task-checklist">
-            <!-- Dynamic checklist pills rendered via JS -->
-          </div>
-        </div>
-        <div class="task-hint-bubble hidden" id="task-hint-box">
-          <span class="hint-prefix">HINT:</span>
-          <span class="hint-text" id="task-hint-text">Hint message</span>
+          <span class="task-title" id="task-title-text">RESTOCK THE LOWEST ITEM: FRESH APPLES (2 UNITS)</span>
+          <span class="task-subtext" id="task-subtext">Look at the pictograph on the left. Find the product with the fewest items and restock its shelf!</span>
         </div>
       </section>
 
-      <!-- MAIN SUPERMARKET SHOPPING FLOOR -->
-      <main class="supermarket-floor">
+      <!-- MAIN SUPERMARKET DATA DASH FLOOR -->
+      <main class="supermarket-data-floor">
 
-        <!-- LEFT COLUMN: SUPERMARKET GROCERY AISLES & SHELVES -->
-        <section class="shelves-section">
-          <!-- Aisle Category Filter Tabs -->
-          <div class="shelf-category-tabs">
-            <button class="cat-tab active" data-cat="all">All Aisles</button>
-            <button class="cat-tab" data-cat="produce">Fruits &amp; Veggies</button>
-            <button class="cat-tab" data-cat="bakery">Bakery &amp; Dairy</button>
-            <button class="cat-tab" data-cat="snacks">Snacks &amp; Drinks</button>
+        <!-- LEFT COLUMN: INTERACTIVE DATA VISUALISATION TERMINAL -->
+        <section class="data-terminal-panel">
+          <div class="terminal-header">
+            <div class="terminal-title-group">
+              <span class="terminal-indicator"></span>
+              <span class="terminal-title" id="chart-title">STORE STOCK PICTOGRAPH</span>
+            </div>
+            <span class="terminal-scale-tag" id="chart-scale-tag">1 ICON = 1 UNIT</span>
           </div>
 
-          <!-- Shelves Header Strip -->
-          <div class="shelves-header-bar">
-            <span class="shelf-title-label">GROCERY SHELVES — TAP ITEMS TO ADD TO BASKET</span>
-            <span class="shelf-instruction">Use <strong>+</strong> or <strong>-</strong> to adjust</span>
+          <!-- Dynamic Chart Display Container -->
+          <div class="chart-display-area" id="chart-viewport">
+            <!-- Rendered dynamically: Pictograph, Bar Chart, or 2-Day Comparison -->
           </div>
 
-          <!-- Shelves Display Container -->
-          <div class="shelves-display-rack" id="shelves-grid">
-            <!-- Product cards rendered dynamically via JS -->
+          <!-- Chart Footer Legend / Insight -->
+          <div class="terminal-footer" id="chart-footer-text">
+            Comparing stock across all 4 grocery aisles
           </div>
         </section>
 
-        <!-- RIGHT COLUMN: SHOPPING BASKET & CASHIER COUNTER -->
-        <aside class="checkout-station">
+        <!-- RIGHT COLUMN: INTERACTIVE SUPERMARKET ACTION ZONE -->
+        <section class="supermarket-action-panel">
+          <div class="action-panel-header">
+            <span class="action-header-title" id="action-panel-title">SUPERMARKET SHELVES</span>
+            <span class="action-header-tip" id="action-panel-tip">Tap or drag crates to restock</span>
+          </div>
 
-          <!-- 1. Shopping Basket Card -->
-          <div class="shopping-basket-card">
-            <div class="basket-card-header">
-              <div class="basket-title-group">
-                <svg class="basket-svg-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm7 17H5V8h14v12zm-7-8c-1.66 0-3-1.34-3-3H7c0 2.76 2.24 5 5 5s5-2.24 5-5h-2c0 1.66-1.34 3-3 3z"/></svg>
-                <span class="basket-heading">YOUR BASKET</span>
-              </div>
-              <span class="basket-item-count" id="basket-item-count">0 items</span>
+          <!-- Dynamic Action Work Area -->
+          <div class="action-work-area" id="action-work-area">
+            <!-- Mode 1: Interactive Shelves Grid -->
+            <div class="shelves-grid-view" id="shelves-view">
+              <!-- Rendered dynamically: Shelf rows with item stacks & restock buttons -->
             </div>
 
-            <!-- Basket Visual Item Bay -->
-            <div class="basket-items-list" id="basket-items-list">
-              <div class="basket-empty-state">
-                <span>Select grocery items on shelves to place them into your basket</span>
+            <!-- Mode 2: Featured Display Ranking Podium (Ordering Mode) -->
+            <div class="featured-ranking-view hidden" id="ranking-view">
+              <div class="ranking-podium-container" id="ranking-podium">
+                <!-- 4 Pedestals for 1st, 2nd, 3rd, 4th -->
+              </div>
+              <div class="ranking-dock-label">AVAILABLE PRODUCTS (TAP TO PLACE IN ORDER):</div>
+              <div class="ranking-products-dock" id="ranking-dock">
+                <!-- Draggable / Clickable Product Badges -->
+              </div>
+              <div class="ranking-actions-row">
+                <button id="btn-reset-ranking" class="arcade-action-btn btn-secondary">RESET ORDER</button>
+                <button id="btn-submit-ranking" class="arcade-action-btn btn-primary">CONFIRM DISPLAY &check;</button>
               </div>
             </div>
 
-            <!-- Basket Subtotal Bar -->
-            <div class="basket-summary-row">
-              <span class="summary-label">Basket Total:</span>
-              <strong class="summary-val font-mono" id="basket-total-text">RM 0.00</strong>
+            <!-- Mode 3: Supermarket Manager Action Deck -->
+            <div class="manager-deck-view hidden" id="manager-view">
+              <div class="manager-cards-grid" id="manager-cards-grid">
+                <!-- Decision action cards -->
+              </div>
             </div>
           </div>
 
-          <!-- 2. Cash Register & Cashier Terminal -->
-          <div class="cash-register-panel">
-
-            <!-- Cashier Dialog Bar -->
-            <div class="cashier-bay">
-              <div class="cashier-avatar" id="cashier-avatar">
-                <div class="avatar-head">
-                  <svg class="cashier-vector-head" viewBox="0 0 40 40">
-                    <circle cx="20" cy="20" r="16" fill="#fcd34d" stroke="#1e3a6a" stroke-width="2"/>
-                    <path d="M10 14 Q20 8 30 14 L32 18 L8 18 Z" fill="#2563eb" stroke="#1e3a6a" stroke-width="1.5"/>
-                    <rect x="6" y="16" width="28" height="3" rx="1.5" fill="#f59e0b"/>
-                    <circle cx="15" cy="22" r="2.2" fill="#0f172a"/>
-                    <circle cx="25" cy="22" r="2.2" fill="#0f172a"/>
-                    <path d="M16 28 Q20 32 24 28" stroke="#0f172a" stroke-width="2" fill="none" stroke-linecap="round"/>
-                  </svg>
-                </div>
-                <div class="avatar-badge">CASHIER</div>
-              </div>
-              <div class="cashier-bubble" id="cashier-bubble">
-                <span id="cashier-speech">"Hello! Put your items in the basket, then pay the exact amount below!"</span>
-              </div>
+          <!-- Delivery Crate Loading Dock / Action Footer -->
+          <div class="delivery-dock-footer" id="delivery-dock">
+            <span class="dock-label">DELIVERY CRATE BAY:</span>
+            <div class="dock-crates-row" id="dock-crates-container">
+              <!-- Crate items to tap/drag -->
             </div>
-
-            <!-- POS Digital LCD Screen -->
-            <div class="pos-screen-unit">
-              <div class="pos-top-status">
-                <span class="pos-store-tag">NUMBERLAND MART POS-88</span>
-                <span class="pos-status-tag" id="pos-status-badge">AWAITING PAYMENT</span>
-              </div>
-              <div class="pos-main-total-row">
-                <span class="pos-total-label">TOTAL DUE:</span>
-                <span class="pos-total-amount font-mono" id="pos-total-due">RM 0.00</span>
-              </div>
-              <div class="pos-subtotal-row">
-                <span class="pos-sub-item">In Tray: <strong id="pos-paid-amount" class="font-mono">RM 0.00</strong></span>
-                <span class="pos-sub-item" id="pos-difference-tag">Needs: <strong class="font-mono">RM 0.00</strong></span>
-              </div>
-            </div>
-
-            <!-- Malaysian Ringgit (RM) Cash Drawer -->
-            <div class="rm-cash-drawer">
-              <div class="drawer-header-strip">
-                <span>CASH DRAWER — MALAYSIAN RINGGIT (RM) &amp; SEN</span>
-              </div>
-
-              <!-- Banknotes Tray -->
-              <div class="notes-tray">
-                <!-- RM50 -->
-                <button class="money-token note-rm note-50" data-value="50.00" title="Add RM 50 Banknote">
-                  <div class="note-inner">
-                    <span class="n-val-top">RM50</span>
-                    <span class="n-label">FIFTY</span>
-                    <span class="n-val-bot">RM50</span>
-                  </div>
-                </button>
-                <!-- RM20 -->
-                <button class="money-token note-rm note-20" data-value="20.00" title="Add RM 20 Banknote">
-                  <div class="note-inner">
-                    <span class="n-val-top">RM20</span>
-                    <span class="n-label">TWENTY</span>
-                    <span class="n-val-bot">RM20</span>
-                  </div>
-                </button>
-                <!-- RM10 -->
-                <button class="money-token note-rm note-10" data-value="10.00" title="Add RM 10 Banknote">
-                  <div class="note-inner">
-                    <span class="n-val-top">RM10</span>
-                    <span class="n-label">TEN</span>
-                    <span class="n-val-bot">RM10</span>
-                  </div>
-                </button>
-                <!-- RM5 -->
-                <button class="money-token note-rm note-5" data-value="5.00" title="Add RM 5 Banknote">
-                  <div class="note-inner">
-                    <span class="n-val-top">RM5</span>
-                    <span class="n-label">FIVE</span>
-                    <span class="n-val-bot">RM5</span>
-                  </div>
-                </button>
-                <!-- RM1 -->
-                <button class="money-token note-rm note-1" data-value="1.00" title="Add RM 1 Banknote">
-                  <div class="note-inner">
-                    <span class="n-val-top">RM1</span>
-                    <span class="n-label">ONE</span>
-                    <span class="n-val-bot">RM1</span>
-                  </div>
-                </button>
-              </div>
-
-              <!-- Coins Tray -->
-              <div class="coins-tray">
-                <!-- 50 sen -->
-                <button class="money-token coin-sen coin-50" data-value="0.50" title="Add 50 sen Coin">
-                  <div class="coin-inner">
-                    <span class="c-val">50c</span>
-                    <span class="c-sub">SEN</span>
-                  </div>
-                </button>
-                <!-- 20 sen -->
-                <button class="money-token coin-sen coin-20" data-value="0.20" title="Add 20 sen Coin">
-                  <div class="coin-inner">
-                    <span class="c-val">20c</span>
-                    <span class="c-sub">SEN</span>
-                  </div>
-                </button>
-                <!-- 10 sen -->
-                <button class="money-token coin-sen coin-10" data-value="0.10" title="Add 10 sen Coin">
-                  <div class="coin-inner">
-                    <span class="c-val">10c</span>
-                    <span class="c-sub">SEN</span>
-                  </div>
-                </button>
-                <!-- 5 sen -->
-                <button class="money-token coin-sen coin-5" data-value="0.05" title="Add 5 sen Coin">
-                  <div class="coin-inner">
-                    <span class="c-val">5c</span>
-                    <span class="c-sub">SEN</span>
-                  </div>
-                </button>
-              </div>
-            </div>
-
-            <!-- Payment Mat / Tray Desk -->
-            <div class="payment-counter-desk">
-              <div class="payment-mat-header">
-                <div class="mat-title-group">
-                  <span class="mat-title">PAYMENT TRAY:</span>
-                </div>
-                <span class="mat-amount font-mono" id="tray-sum-display">RM 0.00</span>
-              </div>
-              <div class="payment-mat-items" id="payment-mat-items">
-                <span class="mat-placeholder">Select banknotes and coins above to place into tray</span>
-              </div>
-              <div class="payment-desk-controls">
-                <button id="btn-undo-money" class="btn-desk btn-undo" title="Remove last added note/coin">UNDO</button>
-                <button id="btn-clear-money" class="btn-desk btn-clear" title="Clear payment tray">CLEAR</button>
-                <button id="btn-pay-checkout" class="btn-desk btn-pay-confirm">
-                  <span>PAY &amp; CHECKOUT</span>
-                </button>
-              </div>
-            </div>
-
           </div>
-        </aside>
+        </section>
+
       </main>
 
-      <!-- SUCCESS CHECKOUT RECEIPT MODAL -->
-      <div id="checkout-success-modal" class="modal-backdrop hidden">
-        <div class="success-card">
-          <div class="receipt-paper">
-            <div class="receipt-header">
-              <div class="receipt-logo">NUMBERLAND MART</div>
-              <div class="receipt-subtitle">OFFICIAL CASH REGISTER RECEIPT</div>
-              <div class="receipt-divider">================================</div>
-            </div>
-
-            <div class="receipt-body">
-              <div class="receipt-row" id="receipt-task-title">
-                <span>Task Completed:</span>
-                <strong id="receipt-task-name">Buy 2 Fresh Apples</strong>
-              </div>
-              <div class="receipt-row">
-                <span>Total Amount:</span>
-                <strong id="receipt-total-amount" class="font-mono">RM 4.00</strong>
-              </div>
-              <div class="receipt-row">
-                <span>Amount Paid:</span>
-                <strong id="receipt-paid-amount" class="font-mono" style="color: #10b981;">RM 4.00</strong>
-              </div>
-              <div class="receipt-row">
-                <span>Payment Status:</span>
-                <strong style="color: #10b981;">EXACT MATCH</strong>
-              </div>
-              <div class="receipt-divider">--------------------------------</div>
-              <div class="receipt-stamp">PAID IN FULL</div>
-            </div>
-
-            <div class="receipt-footer">
-              <div class="success-points-pill font-mono" id="success-points">+150 PTS</div>
-              <p class="receipt-thanks">Thank you for shopping at Numberland Mart!</p>
-            </div>
-          </div>
-
-          <button id="btn-next-task" class="arcade-btn btn-play next-task-btn">NEXT SHOPPING TASK</button>
+      <!-- MICRO-HINT FLOATING TOAST -->
+      <aside id="hint-banner" class="arcade-toast hidden" role="alert">
+        <div class="toast-accent-bar"></div>
+        <div class="toast-body">
+          <div class="toast-title">DATA DASH HINT</div>
+          <div id="hint-text" class="toast-text">Check the chart to find the correct number!</div>
         </div>
-      </div>
+      </aside>
 
       <!-- START SCREEN OVERLAY -->
       <div id="start-screen" class="overlay-screen active">
-        <div class="overlay-card">
-          <div class="logo-badge">SUPERMARKET SIMULATION</div>
-          <h1 class="game-title">MATH<span class="title-highlight">SHOP</span></h1>
-          <p class="game-subtitle">Explore grocery aisles, collect items matching your shopping list, calculate total costs, and pay exact Malaysian Ringgit notes and coins!</p>
-
-          <div class="feature-highlights">
-            <div class="feature-card">
-              <div class="feature-vector-icon">
-                <svg viewBox="0 0 32 32" class="feat-svg"><circle cx="16" cy="18" r="11" fill="#ef4444"/><path d="M16 7 Q18 3 22 4" stroke="#15803d" stroke-width="2.5" fill="none" stroke-linecap="round"/><ellipse cx="14" cy="14" rx="2" ry="4" fill="#fca5a5" transform="rotate(-20 14 14)"/></svg>
-              </div>
-              <strong>Pick Groceries</strong>
-              <span>Explore fresh aisles</span>
-            </div>
-            <div class="feature-card">
-              <div class="feature-vector-icon">
-                <svg viewBox="0 0 32 32" class="feat-svg"><path d="M6 10 L26 10 L22 24 L10 24 Z" fill="#38bdf8" stroke="#1e3a6a" stroke-width="2"/><path d="M10 10 Q16 2 22 10" stroke="#f59e0b" stroke-width="2.5" fill="none"/></svg>
-              </div>
-              <strong>Fill Basket</strong>
-              <span>Match shopping list</span>
-            </div>
-            <div class="feature-card">
-              <div class="feature-vector-icon">
-                <svg viewBox="0 0 32 32" class="feat-svg"><rect x="4" y="8" width="24" height="16" rx="3" fill="#10b981" stroke="#1e3a6a" stroke-width="2"/><circle cx="16" cy="16" r="4" fill="#fcd34d"/></svg>
-              </div>
-              <strong>Pay Exact RM</strong>
-              <span>Notes &amp; sen coins</span>
-            </div>
+        <div class="arcade-modal start-modal">
+          <div class="modal-arcade-header">
+            <span class="arcade-badge badge-gold">SUPERMARKET DATA CHALLENGE</span>
           </div>
 
-          <div class="action-buttons">
-            <button id="start-game-btn" class="arcade-btn btn-play">START SHOPPING</button>
-            <button id="start-how-to-play-btn" class="arcade-btn btn-secondary">HOW TO PLAY</button>
+          <h1 class="arcade-title">MATH<span class="title-pop">SHOP</span></h1>
+          <div class="arcade-subtitle-pill">DATA DASH &bull; DISPLAYING &amp; INTERPRETING DATA</div>
+
+          <p class="arcade-desc">Read store pictographs, bar charts, and sales records! Interpret the data, restock low shelves, rank top-selling products, and run a thriving supermarket.</p>
+
+          <div class="arcade-actions">
+            <button id="start-game-btn" class="arcade-btn btn-primary">
+              <span class="btn-text">START DATA DASH</span>
+            </button>
+            <button id="how-to-play-btn" class="arcade-btn btn-secondary">
+              <span class="btn-text">HOW TO PLAY</span>
+            </button>
           </div>
         </div>
       </div>
 
-      <!-- ANIMATED HOW-TO-PLAY MODAL -->
+      <!-- COUNTDOWN OVERLAY -->
+      <div id="countdown-screen" class="overlay-screen hidden">
+        <div class="countdown-modal">
+          <div id="countdown-number" class="countdown-number">3</div>
+          <div class="countdown-label">OPENING SUPERMARKET DOORS!</div>
+        </div>
+      </div>
+
+      <!-- HOW TO PLAY OVERLAY -->
       <div id="instructions-modal" class="overlay-screen hidden">
-        <div class="overlay-card modal-card">
-          <div class="modal-header">
-            <h2>HOW TO PLAY MATH SHOP</h2>
-            <button id="close-instructions-btn" class="close-btn" aria-label="Close instructions">X</button>
+        <div class="arcade-modal instructions-modal">
+          <div class="modal-arcade-header">
+            <span class="arcade-badge">SUPERMARKET MANAGER GUIDE</span>
           </div>
 
-          <div class="instructions-grid">
-            <div class="instruction-box">
-              <div class="inst-icon font-mono">01</div>
-              <div class="inst-content">
-                <h3>Read the Shopping List</h3>
-                <p>Check the shopping task at the top (e.g. <em>"Buy 2 Apples and 1 Milk"</em>) to see required items.</p>
-              </div>
+          <h2 class="modal-heading">HOW TO PLAY</h2>
+
+          <div class="instruction-cards-grid">
+            <div class="inst-card">
+              <div class="inst-step-num">1</div>
+              <div class="inst-card-title">READ THE DATA</div>
+              <p>Check the left terminal for store pictographs, bar charts, and 2-day sales trends.</p>
             </div>
 
-            <div class="instruction-box">
-              <div class="inst-icon font-mono">02</div>
-              <div class="inst-content">
-                <h3>Pick Products From Shelves</h3>
-                <p>Click items on the shelves to add to your basket. Use <strong>+</strong> or <strong>-</strong> to adjust quantities.</p>
-              </div>
+            <div class="inst-card">
+              <div class="inst-step-num">2</div>
+              <div class="inst-card-title">TAKE ACTION</div>
+              <p>Restock low-stock shelves, arrange products from most to least sold, and feature top sellers.</p>
             </div>
 
-            <div class="instruction-box">
-              <div class="inst-icon font-mono">03</div>
-              <div class="inst-content">
-                <h3>Check Register Total (RM)</h3>
-                <p>The register calculates the total price in Malaysian Ringgit (RM) for all items in your basket.</p>
-              </div>
-            </div>
-
-            <div class="instruction-box">
-              <div class="inst-icon font-mono">04</div>
-              <div class="inst-content">
-                <h3>Pay with Banknotes &amp; Coins</h3>
-                <p>Click RM notes (RM50, RM20, RM10, RM5, RM1) and coins (50c, 20c, 10c, 5c) to match the total exactly!</p>
-              </div>
+            <div class="inst-card">
+              <div class="inst-step-num">3</div>
+              <div class="inst-card-title">DATA DECISIONS</div>
+              <p>Compare quantities, find differences, and unlock the Supermarket Master Trophy!</p>
             </div>
           </div>
 
-          <button id="start-from-instructions-btn" class="arcade-btn btn-play modal-play-btn">
-            LET'S GO SHOPPING
-          </button>
-        </div>
-      </div>
-
-      <!-- END OF SHIFT RESULTS OVERLAY -->
-      <div id="end-screen" class="overlay-screen hidden">
-        <div class="overlay-card">
-          <div class="logo-badge">SHOPPING SPREE COMPLETE</div>
-          <h2 id="end-title" class="game-title">SUPERMARKET CHAMPION!</h2>
-          <p id="end-subtitle" class="game-subtitle">You completed your shopping challenges with outstanding calculation accuracy!</p>
-
-          <div class="stars-awarded" id="stars-container">
-            <div class="star-slot" data-star="1">
-              <svg viewBox="0 0 24 24" class="star-svg"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            </div>
-            <div class="star-slot" data-star="2">
-              <svg viewBox="0 0 24 24" class="star-svg"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            </div>
-            <div class="star-slot" data-star="3">
-              <svg viewBox="0 0 24 24" class="star-svg"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            </div>
-          </div>
-
-          <div class="score-summary-grid">
-            <div class="summary-box">
-              <span class="summary-label">FINAL SCORE</span>
-              <span id="final-score-val" class="summary-val highlight font-mono">000000</span>
-            </div>
-            <div class="summary-box">
-              <span class="summary-label">TASKS COMPLETED</span>
-              <span id="final-tasks-val" class="summary-val highlight-green font-mono">10 / 10</span>
-            </div>
-            <div class="summary-box">
-              <span class="summary-label">REMAINING LIVES</span>
-              <span id="final-lives-val" class="summary-val font-mono">3 / 3</span>
-            </div>
-            <div class="summary-box">
-              <span class="summary-label">TOTAL SPENT</span>
-              <span id="final-spent-val" class="summary-val font-mono">RM 0.00</span>
-            </div>
-          </div>
-
-          <div class="action-buttons">
-            <button id="play-again-btn" class="arcade-btn btn-play">SHOP AGAIN</button>
+          <div class="arcade-actions">
+            <button id="close-instructions-btn" class="arcade-btn btn-secondary">
+              <span class="btn-text">BACK</span>
+            </button>
+            <button id="start-from-instructions-btn" class="arcade-btn btn-primary">
+              <span class="btn-text">START NOW</span>
+            </button>
           </div>
         </div>
       </div>
 
-      <!-- ANIMATED FLYING EFFECT PARTICLES CONTAINER -->
-      <div id="flying-particles-layer" class="particles-layer"></div>
+      <!-- GAME OVER / REWARDS OVERLAY -->
+      <div id="game-over-screen" class="overlay-screen hidden">
+        <div class="arcade-modal game-over-modal">
+          <div class="modal-arcade-header">
+            <span id="game-over-badge" class="arcade-badge badge-gold">STORE SHIFT COMPLETE</span>
+          </div>
+
+          <h2 id="game-over-title" class="arcade-title title-sm">SUPERMARKET MASTER!</h2>
+
+          <!-- 3D Arcade Stars Display (Pure SVG) -->
+          <div class="stars-display-row" id="stars-container">
+            <span class="arcade-star star-active"><svg viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></span>
+            <span class="arcade-star star-active"><svg viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></span>
+            <span class="arcade-star star-active"><svg viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></span>
+          </div>
+
+          <div class="stats-scoreboard">
+            <div class="stat-cell">
+              <span class="stat-label">FINAL SCORE</span>
+              <span id="final-score" class="stat-value font-mono">000000</span>
+            </div>
+            <div class="stat-cell">
+              <span class="stat-label">ROUNDS</span>
+              <span id="final-rounds" class="stat-value">10 / 10</span>
+            </div>
+            <div class="stat-cell">
+              <span class="stat-label">ACCURACY</span>
+              <span id="final-accuracy" class="stat-value">100%</span>
+            </div>
+            <div class="stat-cell">
+              <span class="stat-label">BEST STREAK</span>
+              <span id="final-combo" class="stat-value font-mono">1x</span>
+            </div>
+            <div class="stat-cell">
+              <span class="stat-label">TIME</span>
+              <span id="final-time" class="stat-value">0s</span>
+            </div>
+          </div>
+
+          <div class="arcade-actions">
+            <button id="play-again-btn" class="arcade-btn btn-primary">
+              <span class="btn-text">PLAY AGAIN</span>
+            </button>
+          </div>
+        </div>
+      </div>
 
     </div>
   </div>
